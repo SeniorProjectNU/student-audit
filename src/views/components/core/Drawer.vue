@@ -100,6 +100,21 @@
           title: 'dashboard',
           to: '/',
         },
+        {
+          icon: 'mdi-animation',
+          title: 'Curriculums',
+          to: '/curriculums-list'
+        },
+        {
+          icon: 'mdi-account-group',
+          title: 'Students',
+          to: '/students-list',
+        },
+        {
+          icon: 'mdi-alphabetical',
+          title: 'Template mails',
+          to: '/mails-list',
+        }
       ],
     }),
 

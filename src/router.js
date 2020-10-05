@@ -1,20 +1,38 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Router from 'vue-router'
 
-Vue.use(VueRouter)
+Vue.use(Router)
 
-const routes = [
-  {
-    path: '/',
-    component: () => import('@/views/Index'),
-    children: []
-  }
-]
-
-const router = new VueRouter({
-  mode: 'history',
+export default new Router({
+  mode: 'hash',
   base: process.env.BASE_URL,
-  routes
+  routes: [
+    {
+      path: '/',
+      component: () => import('@/views/Index'),
+      children: [
+        // Dashboard
+        {
+          name: 'Dashboard',
+          path: '',
+          component: () => import('@/views/Dashboard'),
+        },
+        {
+          name: 'Curriculums',
+          path: '/curriculums-list',
+          component: () => import('@/views/tables/RegularTables'),
+        },
+        {
+          name: 'Students',
+          path: '/students-list',
+          component: () => import('@/views/Students'),
+        },
+        {
+          name: 'Template mails',
+          path: '/mails-list',
+          component: () => import('@/views/tables/RegularTables'),
+        }
+      ],
+    },
+  ],
 })
-
-export default router

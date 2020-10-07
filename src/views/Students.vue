@@ -4,23 +4,50 @@
     fluid
     tag="section"
   >
+  <v-row>
+    <v-spacer />
+    <v-col
+      cols="3">
+      <v-btn
+        color="success"
+        @click="addTranscripts()"
+      >
+        Add student transcript
+      </v-btn>
+    </v-col>
+  </v-row>
 
     <base-material-card
       icon="mdi-clipboard-text"
       dark
-      title="Students"
+      title="Students list"
       class="px-5 py-3"
     >
+    <v-row>
+    <v-spacer />
+    <v-col
+      cols="2">
+      <v-select v-model="pageSize"
+        :items ="pageSizeOptions"
+        append-outer-icon="mdi-list"
+        menu-props="auto"
+        hide-details
+        :label="pageSize"
+        single-line
+      >
+      </v-select>
+    </v-col>
+  </v-row>
       <v-simple-table selectable>
         <thead>
           <tr>
             <th><input type="checkbox" @click="selectAll" v-model="selectedStudents"/>
             <label></label></th>
-            <th class="primary--text" @click="sort('Name')">ID</th>
-            <th class="primary--text" @click="sort('Name')">Name</th>
-            <th class="primary--text" @click="sort('Major')">Major</th>
-            <th class="primary--text" @click="sort('Year')">Year</th>
-            <th class="primary--text" icon="mdi-account-remove">Remove</th>
+            <th class="headline" @click="sort('Name')">ID</th>
+            <th class="headline" @click="sort('Name')">Name</th>
+            <th class="headline" @click="sort('Major')">Major</th>
+            <th class="headline" @click="sort('Year')">Year</th>
+            <th class="headline" icon="mdi-account-remove">Remove</th>
           </tr>
         </thead>
 
@@ -31,25 +58,76 @@
             <td><input type="checkbox" :value=item.id v-model="selectedStudents"/>
             <label></label></td>
             <td>{{item.id}}</td>
-            <td> <a href='/student/'>
-            </a>{{item.name}}</td>
+            <td> <router-link tag="headline" :to="{ name: 'Student Audit', params: { id: item.id } }">
+            {{item.name}}</router-link></td>
             <td>{{item.major}}</td>
             <td>{{item.year}}</td>
-            <td @click="removeStudent(item.id)" icon='mdi-account-remove'></td>
+            <td>
+              <v-btn @click="removeStudent(item.id)">
+                <v-icon>mdi-account-remove</v-icon>
+              </v-btn>
+            </td>
           </tr>
         </tbody>
       </v-simple-table>
       <v-row>
         <v-col>
-        <button v-if='prev' @click="prevPage">Previous</button> 
+        <v-btn color="success" v-if='prev' @click="prevPage">Previous</v-btn> 
         </v-col>
         <v-col
           cols="1"
         >
-        <button v-if='next' @click="nextPage">Next</button>
+        <v-btn color="success" v-if='next' @click="nextPage">Next</v-btn>
         </v-col>
       </v-row>
     </base-material-card>
+    <v-row>
+      <v-col
+        cols="2">
+        <v-dialog v-if="selectedStudents.length>0" v-model="dialog">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              color="success"
+              @click="showMails()">
+              Send mails
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title class="display-3">
+              Mails list
+            </v-card-title>
+
+            <v-card-text>
+              {{mails}}
+            </v-card-text>
+
+            <v-divider></v-divider>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="primary"
+                text
+                @click="dialog = false, mails = ''"
+              >
+                Close
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-col>
+      <v-spacer/>
+      <v-col
+        cols="2">
+        <v-btn v-if="selectedStudents.length>1" color="success">
+          <router-link tag="display-2" :to="{ name: 'Compare Students', query: { id: selectedStudents } }" >
+            Compare
+          </router-link>
+        </v-btn>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -59,6 +137,7 @@ export default {
 
   created: function() {
     this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
+    // TODO: fetch data from backend
     /*fetch('')
     .then(res => {
       this.students = res;
@@ -67,39 +146,48 @@ export default {
   data: () => ({
     currentSort: 'Name',
     currentSortDir: 'asc',
-    pageSize: 20,
+    pageSize: 10,
+    pageSizeOptions: [5, 10, 15, 20, 25, 30],
     currentPage: 1,
     prev: false,
     next: true,
+    dialog: false,
+    mails: '',
     selectedStudents: [],
+    // TODO: delete dummy variables
     students: [
       {
         id: 201687073,
         name: 'Aizhan Uristembek',
         major: 'Computer Science',
         year: 2020,
+        mail: 'aizhan.uristembek@nu.edu.kz',
       },
       {
         id: 201514864,
         name: 'Ivan Ivanov',
         major: 'Computer Science',
         year: 2021,
+        mail: 'ivan',
       },
       {
         id: 201743154,
         name: 'Karina Smith',
         major: 'Computer Science',
         year: 2022,
+        mail: 'karina',
       },
       {
         id: 201623785,
         name: 'Elizabeth Turner',
         major: 'Computer Science',
         year: 2021,
+        mail: 'liz',
       },
     ]
   }),
   methods: {
+    // sorting
     sort:function(col) {
       if(this.currentSort == col){
         this.currentSortDir = this.currentSortDir === 'asc' ? 'desc' : 'asc';
@@ -108,6 +196,7 @@ export default {
       }
       console.log(this.currentSort, this.currentSortDir)
     },
+    // navigation
     nextPage:function() {
       if((this.currentPage*this.pageSize) < this.students.length)
         this.currentPage++;
@@ -120,6 +209,7 @@ export default {
       this.prev = (this.currentPage == 1) ? false : true;
       this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
     },
+    // selection
     selection: function( id ) {
       if( this.selectedStudents.includes( id ) ) {
         this.selectedStudents.splice( this.selectedStudents.indexOf( id ), 1 )
@@ -145,6 +235,22 @@ export default {
         this.selectedStudents = [];
       }
     },
+    // addition
+    addTranscript: function( ) {
+
+    },
+    // mails
+    showMails: function( ) {
+      for( var i = 0; i < this.selectedStudents.length; i ++ ) {
+        this.mails += this.students.find(s => s.id === this.selectedStudents[ i ] ).mail
+        this.mails += ', '
+      }
+    },
+    // remove
+    removeStudent: function( id ) {
+      // TODO: send id and command to backend
+      this.students.indexOf( id )
+    },
   },
   computed: {
     sortedStudents: function() {
@@ -163,8 +269,6 @@ export default {
   },
 }
 
-// P.S. sorting doesn't work, have to work on it
-// TODO: add 3 buttons and functionalities
-// TODO: add remove icon and functionality
-// TODO: add link to student profile to name
+// TODO: sorting doesn't work, have to work on it
+// TODO: add button and functionality: add
 </script>

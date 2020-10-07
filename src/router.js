@@ -28,6 +28,16 @@ export default new Router({
           component: () => import('@/views/Students'),
         },
         {
+          name: 'Student Audit',
+          path: '/student/:id',
+          component: () => import('@/views/Student'),
+        },
+        {
+          name: 'Compare Students',
+          path: '/students-comparison/:id',
+          component: () => import('@/views/StudentComparison'),
+        },
+        {
           name: 'Template mails',
           path: '/mails-list',
           component: () => import('@/views/tables/RegularTables'),

@@ -34,7 +34,8 @@ export default new Router({
         },
         {
           name: 'Compare Students',
-          path: '/students-comparison/:id',
+          path: '/students-comparison/',
+          query: ':id',
           component: () => import('@/views/StudentComparison'),
         },
         {

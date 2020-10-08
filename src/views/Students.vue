@@ -8,12 +8,71 @@
     <v-spacer />
     <v-col
       cols="3">
-      <v-btn
-        color="success"
-        @click="addTranscripts()"
-      >
-        Add student transcript
-      </v-btn>
+      <v-dialog v-model="addFiles">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-bind="attrs"
+              v-on="on"
+              color="success">
+              Add student transcript
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title class="display-3">
+              Add transcripts
+            </v-card-title>
+
+            <v-card-text>
+              <v-file-input
+                v-model="files"
+                multiple
+                show-size
+                counter
+                placeholder="Select transcripts"
+                prepend-icon="mdi-paperclip"
+                outlined
+                accept=".pdf"
+              >
+              <template v-slot:selection="{ index, text }">
+                <v-chip
+                  v-if="index < 2"
+                  dark
+                  label
+                  small
+                >
+                  {{ text }}
+                </v-chip>
+
+                <span
+                  v-else-if="index === 2"
+                >
+                  +{{ files.length - 2 }} File(s)
+                </span>
+              </template>
+              </v-file-input>
+            </v-card-text>
+
+            <v-divider></v-divider>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="primary"
+                text
+                @click="addFiles = false, submitFiles()"
+              >
+                Ok
+              </v-btn>
+              <v-btn
+                color="primary"
+                text
+                @click="addFiles = false"
+              >
+                Close
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
     </v-col>
   </v-row>
 
@@ -32,7 +91,7 @@
         append-outer-icon="mdi-list"
         menu-props="auto"
         hide-details
-        :label="pageSize"
+        label="pageSize"
         single-line
       >
       </v-select>
@@ -43,11 +102,11 @@
           <tr>
             <th><input type="checkbox" @click="selectAll" v-model="selectedStudents"/>
             <label></label></th>
-            <th class="headline" @click="sort('Name')">ID</th>
-            <th class="headline" @click="sort('Name')">Name</th>
-            <th class="headline" @click="sort('Major')">Major</th>
-            <th class="headline" @click="sort('Year')">Year</th>
-            <th class="headline" icon="mdi-account-remove">Remove</th>
+            <th class="display-1" @click="sort('id')">ID</th>
+            <th class="display-1" @click="sort('name')">Name</th>
+            <th class="display-1" @click="sort('major')">Major</th>
+            <th class="display-1" @click="sort('year')">Year</th>
+            <th class="display-1" icon="mdi-account-remove">Remove</th>
           </tr>
         </thead>
 
@@ -58,7 +117,7 @@
             <td><input type="checkbox" :value=item.id v-model="selectedStudents"/>
             <label></label></td>
             <td>{{item.id}}</td>
-            <td> <router-link tag="headline" :to="{ name: 'Student Audit', params: { id: item.id } }">
+            <td> <router-link tag="button" :to="{ name: 'Student Audit', params: { id: item.id } }">
             {{item.name}}</router-link></td>
             <td>{{item.major}}</td>
             <td>{{item.year}}</td>
@@ -84,7 +143,7 @@
     <v-row>
       <v-col
         cols="2">
-        <v-dialog v-if="selectedStudents.length>0" v-model="dialog">
+        <v-dialog v-if="selectedStudents.length>0" v-model="send">
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               v-bind="attrs"
@@ -110,7 +169,7 @@
               <v-btn
                 color="primary"
                 text
-                @click="dialog = false, mails = ''"
+                @click="send = false, mails = ''"
               >
                 Close
               </v-btn>
@@ -121,11 +180,12 @@
       <v-spacer/>
       <v-col
         cols="2">
-        <v-btn v-if="selectedStudents.length>1" color="success">
-          <router-link tag="display-2" :to="{ name: 'Compare Students', query: { id: selectedStudents } }" >
-            Compare
-          </router-link>
-        </v-btn>
+        <router-link v-if="selectedStudents.length>1"
+          :to="{ name: 'Compare Students', query: { id: selectedStudents } }" >
+          <v-btn  color="success">
+              Compare
+          </v-btn>
+        </router-link>
       </v-col>
     </v-row>
   </v-container>
@@ -145,13 +205,15 @@ export default {
   },
   data: () => ({
     currentSort: 'Name',
-    currentSortDir: 'asc',
+    currentSortDir: 1,
     pageSize: 10,
     pageSizeOptions: [5, 10, 15, 20, 25, 30],
     currentPage: 1,
     prev: false,
     next: true,
-    dialog: false,
+    send: false,
+    files: [],
+    addFiles: false,
     mails: '',
     selectedStudents: [],
     // TODO: delete dummy variables
@@ -188,13 +250,12 @@ export default {
   }),
   methods: {
     // sorting
-    sort:function(col) {
-      if(this.currentSort == col){
-        this.currentSortDir = this.currentSortDir === 'asc' ? 'desc' : 'asc';
+    sort: function ( col ) {
+      if(this.currentSort === col){
+        this.currentSortDir = this.currentSortDir === 1 ? -1 : 1;
       }else{
         this.currentSort = col;
       }
-      console.log(this.currentSort, this.currentSortDir)
     },
     // navigation
     nextPage:function() {
@@ -206,8 +267,8 @@ export default {
     prevPage:function() {
       if(this.currentPage > 1)
         this.currentPage--;
-      this.prev = (this.currentPage == 1) ? false : true;
       this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
+      this.prev = (this.currentPage == 1) ? false : true;
     },
     // selection
     selection: function( id ) {
@@ -228,6 +289,7 @@ export default {
     },
     selectAll: function( ) {
       if( !this.containsAll() ) {
+        this.selectedStudents = []
         for( var i = 0; i < this.students.length; i ++ ) {
           this.selectedStudents.push( this.students[ i ].id )
         }
@@ -236,8 +298,29 @@ export default {
       }
     },
     // addition
-    addTranscript: function( ) {
-
+    submitFiles: function() {
+      if ( this.files.length != 0 ) {
+        let formData = new FormData();
+        formData.append('transcripts', JSON.stringify( this.files ) );
+        // TODO: send to back
+        /*axios.post("/",
+          formData, 
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+          ).then(response => {
+            console.log("Success!");
+            console.log({ response });
+          })
+          .catch(error => {
+            console.log({ error });
+          });*/
+      } else {
+        console.log("there are no files.");
+      }
+      this.files = []
     },
     // mails
     showMails: function( ) {
@@ -249,16 +332,15 @@ export default {
     // remove
     removeStudent: function( id ) {
       // TODO: send id and command to backend
-      this.students.indexOf( id )
+      var student = this.students.find(s => s.id === id )
+      this.students.splice( this.students.indexOf( student ), 1 )
     },
   },
   computed: {
     sortedStudents: function() {
-      return this.students.slice(0).sort((a,b) => {
-        let modifier = 1;
-        if(this.currentSortDir === 'desc') modifier = -1;
-        if(a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
-        if(a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
+      return this.students.slice().sort((a,b) => {
+        if(a[this.currentSort] < b[this.currentSort]) return -1 * this.currentSortDir;
+        if(a[this.currentSort] > b[this.currentSort]) return this.currentSortDir;
         return 0;
       }).filter((row, index) => {
         let start = (this.currentPage-1)*this.pageSize;
@@ -267,8 +349,11 @@ export default {
       });
     },
   },
+  watch: {
+    pageSize: function() {
+      this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
+      this.prev = (this.currentPage == 1) ? false : true;
+    },
+  },
 }
-
-// TODO: sorting doesn't work, have to work on it
-// TODO: add button and functionality: add
 </script>

@@ -25,20 +25,9 @@
       nav
     >
       <v-list-item>
-        <v-list-item-avatar
-          class="align-self-center"
-          color="white"
-          contain
-        >
-          <v-img
-            src="https://demos.creative-tim.com/vuetify-material-dashboard/favicon.ico"
-            max-height="30"
-          />
-        </v-list-item-avatar>
-
         <v-list-item-content>
           <v-list-item-title
-            class="display-1"
+            class="display-2"
             v-text="profile.title"
           />
         </v-list-item-content>
@@ -72,6 +61,32 @@
 
       <div />
     </v-list>
+
+    <template v-slot:append>
+      <v-list-item>
+        <v-row
+                align="center"
+                no-gutters
+        >
+          <v-col cols="auto">
+            Dark Mode
+          </v-col>
+
+          <v-spacer />
+
+          <v-col cols="auto">
+            <v-switch
+                    v-model="$vuetify.theme.dark"
+                    class="ma-0 pa-0"
+                    color="secondary"
+                    hide-details
+            />
+          </v-col>
+        </v-row>
+      </v-list-item>
+    </template>
+
+
   </v-navigation-drawer>
 </template>
 
@@ -99,7 +114,7 @@
           to: '/',
         },
         {
-          icon: 'mdi-animation',
+          icon: 'mdi-calendar-multiple',
           title: 'Curriculums',
           to: '/curriculums-list'
         },
@@ -108,11 +123,11 @@
           title: 'Students',
           to: '/students-list',
         },
-        {
-          icon: 'mdi-email-multiple-outline',
-          title: 'Template mails',
-          to: '/mails-list',
-        }
+        // {
+        //   icon: 'mdi-email-multiple-outline',
+        //   title: 'Template mails',
+        //   to: '/mails-list',
+        // }
       ],
     }),
 

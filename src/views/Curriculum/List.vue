@@ -5,7 +5,7 @@
             tag="section"
     >
         <base-material-card
-                icon="mdi-clipboard-text"
+                icon="mdi-calendar-multiple"
                 title="Curriculum List"
                 class="px-5 py-3"
         >

@@ -89,7 +89,7 @@
   </v-row>
 
     <base-material-card
-      icon="mdi-account-group"
+      icon="mdi-clipboard-text"
       title="Students list"
       class="px-5 py-3"
     >
@@ -100,6 +100,7 @@
             <label></label></th>
             <th class="display-1" @click="sort('id')">ID</th>
             <th class="display-1" @click="sort('name')">Name</th>
+            <th class="display-1" @click="sort('GPA')">Cumulative GPA</th>
             <th class="display-1" @click="sort('major')">Major</th>
             <th class="display-1" @click="sort('year')">Year</th>
             <th class="display-1">Remove</th>
@@ -115,6 +116,7 @@
             <td>{{item.id}}</td>
             <td> <router-link tag="button" :to="{ name: 'Student Audit', params: { id: item.id } }">
             {{item.name}}</router-link></td>
+            <td>{{item.GPA}}</td>
             <td>{{item.major}}</td>
             <td>{{item.year}}</td>
             <td>
@@ -189,10 +191,6 @@
 export default {
   name: 'StudentsList',
 
-  created: function() {
-    this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
-    // TODO: get data from backend
-  },
   data: () => ({
     currentSort: 'Name',
     currentSortDir: 1,
@@ -206,41 +204,75 @@ export default {
     addFiles: false,
     mails: '',
     selectedStudents: [],
-    // TODO: delete dummy variables
-    students: [
+    students: []
+  }),
+  computed: {
+    sortedStudents() {
+      return this.students.slice().sort((a,b) => {
+        if(a[this.currentSort] < b[this.currentSort]) return -1 * this.currentSortDir;
+        if(a[this.currentSort] > b[this.currentSort]) return this.currentSortDir;
+        return 0;
+      }).filter((row, index) => {
+        let start = (this.currentPage-1)*this.pageSize;
+        let end = this.currentPage*this.pageSize;
+        if(index >= start && index < end) return true;
+      });
+    },
+  },
+  watch: {
+    pageSize() {
+      this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
+      this.prev = (this.currentPage == 1) ? false : true;
+    },
+    selectedStudents() {
+      if( this.selectedStudents.includes( null ) && this.students.length + 1 !== this.selectedStudents.length ) {
+        this.selectedStudents.splice( this.selectedStudents.indexOf( null ) , 1 )
+      } else if( this.selectedStudents.length === this.students.length ) {
+        this.selectedStudents.push( null )
+      }
+    }
+  },
+  methods: {
+    // get information
+    getStudents() {
+      // TODO: get data from backend
+      this.students = [
       {
         id: 201687073,
         name: 'Aizhan Uristembek',
         major: 'Computer Science',
         year: 2020,
         mail: 'aizhan.uristembek@nu.edu.kz',
+        GPA: 3.50.toFixed(2),
       },
       {
         id: 201514864,
         name: 'Ivan Ivanov',
         major: 'Computer Science',
         year: 2021,
-        mail: 'ivan',
+        mail: 'ivan@gmail.com',
+        GPA: 4.00.toFixed(2),
       },
       {
         id: 201743154,
         name: 'Karina Smith',
         major: 'Computer Science',
         year: 2022,
-        mail: 'karina',
+        mail: 'karina@gmail.com',
+        GPA: 3.99,
       },
       {
         id: 201623785,
         name: 'Elizabeth Turner',
         major: 'Computer Science',
         year: 2021,
-        mail: 'liz',
+        mail: 'liz@gmail.com',
+        GPA: 2.57,
       },
     ]
-  }),
-  methods: {
+    },
     // sorting
-    sort: function ( col ) {
+    sort ( col ) {
       if(this.currentSort === col){
         this.currentSortDir = this.currentSortDir === 1 ? -1 : 1;
       }else{
@@ -248,27 +280,20 @@ export default {
       }
     },
     // navigation
-    nextPage:function() {
+    nextPage() {
       if((this.currentPage*this.pageSize) < this.students.length)
         this.currentPage++;
       this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
       this.prev = (this.currentPage == 1) ? false : true;
     },
-    prevPage:function() {
+    prevPage() {
       if(this.currentPage > 1)
         this.currentPage--;
       this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
       this.prev = (this.currentPage == 1) ? false : true;
     },
     // selection
-    selection: function( id ) {
-      if( this.selectedStudents.includes( id ) ) {
-        this.selectedStudents.splice( this.selectedStudents.indexOf( id ), 1 )
-      } else {
-        this.selectedStudents.push( id )
-      }
-    },
-    containsAll: function() {
+    containsAll() {
       let count = 0;
       for( var i = 0; i < this.students.length; i ++ ) {
         if( this.selectedStudents.includes( this.students[ i ].id ) ) {
@@ -277,18 +302,19 @@ export default {
       }
       return this.students.length == count;
     },
-    selectAll: function( ) {
+    selectAll( ) {
       if( !this.containsAll() ) {
         this.selectedStudents = []
         for( var i = 0; i < this.students.length; i ++ ) {
-          this.selectedStudents.push( this.students[ i ].id )
+          if( !this.selectedStudents.includes( this.students[ i ].id ) )
+            this.selectedStudents.push( this.students[ i ].id )
         }
       } else {
         this.selectedStudents = [];
       }
     },
-    // addition
-    submitFiles: function() {
+    // transcript addition
+    submitFiles() {
       if ( this.files.length != 0 ) {
         let formData = new FormData();
         formData.append('transcripts', JSON.stringify( this.files ) );
@@ -313,37 +339,22 @@ export default {
       this.files = []
     },
     // mails
-    showMails: function( ) {
+    showMails( ) {
       for( var i = 0; i < this.selectedStudents.length; i ++ ) {
         this.mails += this.students.find(s => s.id === this.selectedStudents[ i ] ).mail
         this.mails += ', '
       }
     },
     // remove
-    removeStudent: function( id ) {
+    removeStudent( id ) {
       // TODO: send id and command to backend
       var student = this.students.find(s => s.id === id )
       this.students.splice( this.students.indexOf( student ), 1 )
     },
   },
-  computed: {
-    sortedStudents: function() {
-      return this.students.slice().sort((a,b) => {
-        if(a[this.currentSort] < b[this.currentSort]) return -1 * this.currentSortDir;
-        if(a[this.currentSort] > b[this.currentSort]) return this.currentSortDir;
-        return 0;
-      }).filter((row, index) => {
-        let start = (this.currentPage-1)*this.pageSize;
-        let end = this.currentPage*this.pageSize;
-        if(index >= start && index < end) return true;
-      });
-    },
-  },
-  watch: {
-    pageSize: function() {
-      this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
-      this.prev = (this.currentPage == 1) ? false : true;
-    },
+  created() {
+    this.getStudents();
+    this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
   },
 }
 </script>

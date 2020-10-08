@@ -117,24 +117,29 @@
 <script>
   export default {
     name: 'DashboardDashboard',
-    created: function() {
-      // TODO: fetch data from backend:
-      // student, courseGPAchart, averageGPAchart, curriculum-transcript
-    },
     data () {
       return {
-        // TODO: delete dummy variables
         // TODO: data for table
         taken: 0,
         earned: 0,
-        student: {
+        student: {},
+        semesterGPAchart: {},
+        courseGPAchart: {},
+      }
+    },
+    methods: {
+      // TODO: get data from back
+      getStudentInfo() {
+        this.student = {
           name: 'Aizhan Uristembek',
           id: 201687073,
           major: 'Computer Science',
           year: 2021,
           mail: 'aizhan.uristembek@nu.edu.kz',
-        },
-        semesterGPAchart: {
+        }
+      },
+      getSemesterChart() {
+        this.semesterGPAchart = {
           data: {
             labels: ['Fall 2017', 'Spring 2018', 'Summer 2018', 'Fall 2018',
                     'Spring 2019', 'Fall 2019', 'Spring 2020', 'Fall 2020', 'Spring 2021'],
@@ -155,8 +160,10 @@
               left: 0,
             },
           },
-        },
-        courseGPAchart: {
+        }
+      },
+      getCourseChart() {
+        this.courseGPAchart = {
           data: {
             labels: ['Core', 'Math', 'Natural', 'SHSS', 'Free'],
             series: [
@@ -186,12 +193,12 @@
               },
             }],
           ],
-        },
-      }
-    },
+        }
+      },
+      getReport() {
 
-    methods: {
-      downloadAudit: function( ) {
+      },
+      downloadAudit( ) {
         // TODO: try after Nurken imports axios
         /*
         axios({
@@ -208,9 +215,12 @@
           link.click();
         }); */
       },
-      complete (index) {
-        this.list[index] = !this.list[index]
-      },
+    },
+    created() {
+      this.getStudentInfo()
+      this.getCourseChart()
+      this.getSemesterChart()
+      this.getReport()
     },
   }
 </script>

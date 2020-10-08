@@ -25,18 +25,18 @@ export default new Router({
         {
           name: 'Students',
           path: '/students-list',
-          component: () => import('@/views/Students'),
+          component: () => import('@/views/Student/List'),
         },
         {
           name: 'Student Audit',
           path: '/student/:id',
-          component: () => import('@/views/Student'),
+          component: () => import('@/views/Student/Audit'),
         },
         {
           name: 'Compare Students',
           path: '/students-comparison/',
           query: ':id',
-          component: () => import('@/views/StudentComparison'),
+          component: () => import('@/views/Student/Comparison'),
         },
         {
           name: 'Template mails',

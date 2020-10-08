@@ -89,8 +89,7 @@
   </v-row>
 
     <base-material-card
-      icon="mdi-clipboard-text"
-      dark
+      icon="mdi-account-group"
       title="Students list"
       class="px-5 py-3"
     >

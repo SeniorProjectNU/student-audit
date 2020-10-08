@@ -20,7 +20,7 @@ export default new Router({
         {
           name: 'Curriculums',
           path: '/curriculums-list',
-          component: () => import('@/views/tables/RegularTables'),
+          component: () => import('@/views/Curriculum/List'),
         },
         {
           name: 'Students',

@@ -7,71 +7,11 @@
   <v-row>
     <v-col
       cols="3">
-      <v-dialog v-model="addFiles">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs"
-              v-on="on"
-              color="success">
-              Add student transcript
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-title class="display-3">
-              Add transcripts
-            </v-card-title>
-
-            <v-card-text>
-              <v-file-input
-                v-model="files"
-                multiple
-                show-size
-                counter
-                placeholder="Select transcripts"
-                prepend-icon="mdi-paperclip"
-                outlined
-                accept=".pdf"
-              >
-              <template v-slot:selection="{ index, text }">
-                <v-chip
-                  v-if="index < 2"
-                  dark
-                  label
-                  small
-                >
-                  {{ text }}
-                </v-chip>
-
-                <span
-                  v-else-if="index === 2"
-                >
-                  +{{ files.length - 2 }} File(s)
-                </span>
-              </template>
-              </v-file-input>
-            </v-card-text>
-
-            <v-divider></v-divider>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                color="primary"
-                text
-                @click="addFiles = false, submitFiles()"
-              >
-                Ok
-              </v-btn>
-              <v-btn
-                color="primary"
-                text
-                @click="addFiles = false"
-              >
-                Close
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <v-btn
+          color="success"
+          @click="addFiles=true">
+          Add student transcript
+        </v-btn>
     </v-col>
     <v-spacer/>
     <v-col
@@ -139,39 +79,12 @@
     <v-row>
       <v-col
         cols="2">
-        <v-dialog v-if="selectedStudents.length>0" v-model="send">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-bind="attrs"
-              v-on="on"
-              color="success"
-              @click="showMails()">
-              Send mails
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-title class="display-3">
-              Mails list
-            </v-card-title>
-
-            <v-card-text>
-              {{mails}}
-            </v-card-text>
-
-            <v-divider></v-divider>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                color="primary"
-                text
-                @click="send = false, mails = ''"
-              >
-                Close
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
+        <v-btn
+          v-if="selectedStudents.length>0"
+          color="success"
+          @click="send=true, showMails()">
+          Send mails
+        </v-btn>
       </v-col>
       <v-spacer/>
       <v-col
@@ -184,6 +97,114 @@
         </router-link>
       </v-col>
     </v-row>
+    <v-dialog
+      v-model="addFiles"
+      max-width="600">
+      <v-card>
+        <v-card-title class="display-2">
+          Add transcripts
+        <v-spacer />
+      
+        <v-icon
+          aria-label="Close"
+          @click="addFiles = false"
+        >
+          mdi-close
+        </v-icon>
+        </v-card-title>
+
+        <v-card-text>
+          <v-file-input
+            v-model="files"
+            multiple
+            show-size
+            counter
+            placeholder="Select transcripts"
+            prepend-icon="mdi-paperclip"
+            outlined
+            accept=".pdf"
+          >
+          <template v-slot:selection="{ index, text }">
+            <v-chip
+              v-if="index < 2"
+              dark
+              label
+              small
+            >
+              {{ text }}
+            </v-chip>
+
+            <span
+              v-else-if="index === 2"
+            >
+              +{{ files.length - 2 }} File(s)
+            </span>
+          </template>
+          </v-file-input>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="addFiles = false, submitFiles()"
+          >
+            Ok
+          </v-btn>
+          <v-btn
+            color="primary"
+            text
+            @click="addFiles = false"
+          >
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog
+      v-model="send"
+      max-width="600">
+      <v-card>
+        <v-card-title class="display-2">
+          Mails list
+
+        <v-spacer />
+          
+        <v-icon
+          aria-label="Close"
+          @click="send=false, mails=''"
+        >
+          mdi-close
+        </v-icon>
+        </v-card-title>
+        <v-card-text v-model="mails" id="tocopy">
+          {{mails}}
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="copyMails()"
+          >
+            Copy to clipboard
+          </v-btn>
+          <v-btn
+            color="primary"
+            text
+            @click="send = false, mails = ''"
+          >
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -344,6 +365,9 @@ export default {
         this.mails += this.students.find(s => s.id === this.selectedStudents[ i ] ).mail
         this.mails += ', '
       }
+    },
+    copyMails() {
+      navigator.clipboard.writeText(this.mails);
     },
     // remove
     removeStudent( id ) {

@@ -111,7 +111,7 @@
           to: '/students-list',
         },
         {
-          icon: 'mdi-alphabetical',
+          icon: 'mdi-email-multiple-outline',
           title: 'Template mails',
           to: '/mails-list',
         }

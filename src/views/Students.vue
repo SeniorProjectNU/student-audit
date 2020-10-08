@@ -5,7 +5,6 @@
     tag="section"
   >
   <v-row>
-    <v-spacer />
     <v-col
       cols="3">
       <v-dialog v-model="addFiles">
@@ -74,21 +73,12 @@
           </v-card>
         </v-dialog>
     </v-col>
-  </v-row>
-
-    <base-material-card
-      icon="mdi-clipboard-text"
-      dark
-      title="Students list"
-      class="px-5 py-3"
-    >
-    <v-row>
-    <v-spacer />
+    <v-spacer/>
     <v-col
       cols="2">
       <v-select v-model="pageSize"
         :items ="pageSizeOptions"
-        append-outer-icon="mdi-list"
+        prepend-icon="mdi-format-align-justify"
         menu-props="auto"
         hide-details
         label="pageSize"
@@ -97,6 +87,13 @@
       </v-select>
     </v-col>
   </v-row>
+
+    <base-material-card
+      icon="mdi-clipboard-text"
+      dark
+      title="Students list"
+      class="px-5 py-3"
+    >
       <v-simple-table selectable>
         <thead>
           <tr>
@@ -106,7 +103,7 @@
             <th class="display-1" @click="sort('name')">Name</th>
             <th class="display-1" @click="sort('major')">Major</th>
             <th class="display-1" @click="sort('year')">Year</th>
-            <th class="display-1" icon="mdi-account-remove">Remove</th>
+            <th class="display-1">Remove</th>
           </tr>
         </thead>
 
@@ -122,9 +119,7 @@
             <td>{{item.major}}</td>
             <td>{{item.year}}</td>
             <td>
-              <v-btn @click="removeStudent(item.id)">
-                <v-icon>mdi-account-remove</v-icon>
-              </v-btn>
+              <v-icon @click="removeStudent(item.id)">mdi-account-remove</v-icon>
             </td>
           </tr>
         </tbody>
@@ -197,11 +192,7 @@ export default {
 
   created: function() {
     this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
-    // TODO: fetch data from backend
-    /*fetch('')
-    .then(res => {
-      this.students = res;
-    })*/
+    // TODO: get data from backend
   },
   data: () => ({
     currentSort: 'Name',

@@ -38,6 +38,16 @@ export default new Router({
           query: ':id',
           component: () => import('@/views/Student/Comparison'),
         },
+        {
+          name: 'Template mails',
+          path: '/mails-list',
+          component: () => import('@/views/TemplateMails/List'),
+        },
+        {
+          name: 'Mail modification',
+          path: '/modify-mail/:id',
+          component: () => import('@/views/TemplateMails/Modify')
+        }
       ],
     },
   ],

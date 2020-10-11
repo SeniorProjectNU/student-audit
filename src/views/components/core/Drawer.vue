@@ -2,10 +2,9 @@
   <v-navigation-drawer
     id="core-navigation-drawer"
     v-model="drawer"
+    color="#ffffff"
     :dark="barColor !== 'rgba(228, 226, 226, 1), rgba(255, 255, 255, 0.7)'"
     :expand-on-hover="expandOnHover"
-    :right="$vuetify.rtl"
-    :src="barImage"
     mobile-break-point="960"
     app
     width="260"
@@ -78,7 +77,7 @@
             <v-switch
                     v-model="$vuetify.theme.dark"
                     class="ma-0 pa-0"
-                    color="secondary"
+                    color="white"
                     hide-details
             />
           </v-col>

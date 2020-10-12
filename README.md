@@ -1,4 +1,4 @@
-# front
+# Front
 
 ## Project setup
 ```
@@ -24,6 +24,3 @@ npm run lint
 ```
 npm install vue-chartist
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

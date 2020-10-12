@@ -23,6 +23,12 @@ export default new Router({
           component: () => import('@/views/Curriculum/List'),
         },
         {
+          name: 'Curriculum',
+          path: '/curriculum',
+          props: route => ({ action: route.query.action }),
+          component: () => import('@/views/Curriculum/Index'),
+        },
+        {
           name: 'Students',
           path: '/students-list',
           component: () => import('@/views/Student/List'),

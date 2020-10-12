@@ -4,6 +4,29 @@
             fluid
             tag="section"
     >
+        <v-row justify="space-between">
+            <v-col cols="2" md="2">
+                <v-select v-model="pageSize"
+                          :items ="pageSizeOptions"
+                          prepend-icon="mdi-format-align-justify"
+                          menu-props="auto"
+                          hide-details
+                          label="pageSize"
+                          single-line
+                >
+                </v-select>
+            </v-col>
+            <v-spacer/>
+            <v-col cols="2" md="2">
+                <router-link :to="{ name: 'Curriculum', query: { action: 'create' } }">
+                    <v-btn
+                        color="success"
+                        @click="addFiles=true">
+                        Add curriculum
+                    </v-btn>
+                </router-link>
+            </v-col>
+        </v-row>
         <base-material-card
                 icon="mdi-calendar-multiple"
                 title="Curriculum List"
@@ -12,6 +35,9 @@
             <v-simple-table>
                 <thead>
                 <tr>
+                    <th>
+                        <input class="mr-3" type="checkbox" @click="selectAll" v-model="allSelected"/>
+                    </th>
                     <th class="primary--text display-1">
                         Major
                     </th>
@@ -25,6 +51,7 @@
 
                 <tbody>
                 <tr v-for="(plan, index) in curriculums" :key="index" >
+                    <td><input type="checkbox" :value=plan.id v-model="selectedCurriculums"/>
                     <td>{{plan.major}}</td>
                     <td>{{plan.year}}</td>
                     <td class="text-right">
@@ -42,6 +69,7 @@
                         <v-tooltip open-delay="83" bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-icon
+                                        @click="deleteCurriculum(plan.id, index)"
                                         v-bind="attrs"
                                         v-on="on"
                                         color="error"
@@ -57,7 +85,6 @@
             </v-simple-table>
         </base-material-card>
 
-<!--        <div class="py-3" />-->
     </v-container>
 </template>
 
@@ -67,6 +94,10 @@
       data () {
         return {
           curriculums: [],
+          selectedCurriculums: [],
+          allSelected: false,
+          pageSize: 10,
+          pageSizeOptions: [5, 10, 15, 20, 25, 30],
         }
       },
 
@@ -77,58 +108,58 @@
           _this.curriculums = [
             {
               major: 'Computer Science',
-              year: 2012
+              year: 2012,
+              id: 1
             },
             {
-              major: 'Computer Science',
-              year: 2012
+              major: 'Political Science',
+              year: 2042,
+              id: 2
             },
             {
-              major: 'Computer Science',
-              year: 2012
+              major: 'Physics',
+              year: 2011,
+              id: 3
             },
             {
-              major: 'Computer Science',
-              year: 2012
+              major: 'Basketball',
+              year: 2022,
+              id: 4
             },
             {
-              major: 'Computer Science',
-              year: 2012
+              major: 'Robotics',
+              year: 2018,
+              id: 5
             },
             {
-              major: 'Computer Science',
-              year: 2012
+              major: 'German language',
+              year: 2030,
+              id: 6
             },
-            {
-              major: 'Computer Science',
-              year: 2012
-            },
-            {
-              major: 'Computer Science',
-              year: 2012
-            },
-            {
-              major: 'Computer Science',
-              year: 2012
-            },
-            {
-              major: 'Computer Science',
-              year: 2012
-            },
-            {
-              major: 'Computer Science',
-              year: 2012
-            },
-            {
-              major: 'Computer Science',
-              year: 2012
-            }
           ]
+        },
+        deleteCurriculum(id, index){
+          let _this = this;
+          _this.curriculums.splice(index, 1);
+        },
+        selectAll() {
+          this.selectedCurriculums = [];
+          if (!this.allSelected){
+            this.allSelected = true;
+            this.curriculums.forEach(x => this.selectedCurriculums.push(x.id))
+          } else
+            this.allSelected = false
         }
       },
 
       created() {
         this.getCurriculums();
+      },
+
+      watch: {
+        selectedCurriculums(val) {
+          this.allSelected = val.length === this.curriculums.length
+        }
       }
     }
 </script>

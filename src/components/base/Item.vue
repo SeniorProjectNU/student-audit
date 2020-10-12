@@ -4,7 +4,8 @@
     :rel="href && href !== '#' ? 'noopener' : undefined"
     :target="href && href !== '#' ? '_blank' : undefined"
     :to="item.to"
-    :class="item.to == $route.path ? `primary ${!isDark ? 'black' : 'white'}--text` : ''"
+    :class="$route.path.includes(item.group) || ($route.path == '/' && item.group == 'dashboard')
+     ? `primary ${!isDark ? 'black' : 'white'}--text` : ''"
   >
     <v-list-item-icon
       v-if="text"

@@ -54,17 +54,19 @@
                     <td>{{plan.major}}</td>
                     <td>{{plan.year}}</td>
                     <td class="text-right">
-                        <v-tooltip open-delay="83" bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                                <v-icon
-                                        v-bind="attrs"
-                                        v-on="on"
-                                        class="mx-1">
-                                    mdi-pencil
-                                </v-icon>
-                            </template>
-                            <span>Edit</span>
-                        </v-tooltip>
+                        <router-link tag="button" :to="{ name: 'Curriculum', query: { action: 'edit' } }">
+                            <v-tooltip open-delay="83" bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-icon
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            class="mx-1">
+                                        mdi-pencil
+                                    </v-icon>
+                                </template>
+                                <span>Edit</span>
+                            </v-tooltip>
+                        </router-link>
                         <v-tooltip open-delay="83" bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-icon

@@ -283,6 +283,49 @@
 
         submitFile(){
 
+        },
+
+        getCurriculum(){
+          let _this = this;
+          _this.form.curriculum = {
+            id: '3',
+            year: '2020',
+            major: 'Computer Science',
+            courses: [
+              {
+                code: 'CSCI 253',
+                name: 'Intro to Programming',
+                type: 'Core',
+                credits: '6'
+              },
+              {
+                code: 'CSCI 253',
+                name: 'Intro to Programming',
+                type: 'Core',
+                credits: '6'
+              },
+              {
+                code: 'CSCI 253',
+                name: 'Intro to Programming',
+                type: 'Core',
+                credits: '6'
+              },
+              {
+                code: 'CSCI 253',
+                name: 'Intro to Programming',
+                type: 'Core',
+                credits: '6'
+              },
+              {
+                code: 'CSCI 253',
+                name: 'Intro to Programming',
+                type: 'Core',
+                credits: '6'
+              }
+            ]
+          }
+
+          _this.stage = 1;
         }
       },
 
@@ -292,6 +335,11 @@
           this.form.curriculum.courses.forEach(x => sum+=parseInt(x.credits));
           return sum;
         }
+      },
+
+      created() {
+        if (this.action === 'edit')
+          this.getCurriculum();
       }
     }
 </script>

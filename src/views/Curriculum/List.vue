@@ -5,7 +5,7 @@
             tag="section"
     >
         <v-row justify="space-between">
-            <v-col cols="2" md="2">
+            <v-col cols="6" md="2">
                 <v-select v-model="pageSize"
                           :items ="pageSizeOptions"
                           prepend-icon="mdi-format-align-justify"
@@ -17,11 +17,10 @@
                 </v-select>
             </v-col>
             <v-spacer/>
-            <v-col cols="2" md="2">
+            <v-col cols="6" md="2">
                 <router-link :to="{ name: 'Curriculum', query: { action: 'create' } }">
                     <v-btn
-                        color="success"
-                        @click="addFiles=true">
+                        color="success">
                         Add curriculum
                     </v-btn>
                 </router-link>

@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import './plugins/base'
 import './plugins/chartist'
+import './plugins/vue-the-mask'
 import i18n from './i18n'
 import vuetify from './plugins/vuetify';
 

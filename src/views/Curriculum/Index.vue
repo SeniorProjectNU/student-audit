@@ -1,22 +1,31 @@
 <template>
     <v-container
-            id="user-profile"
             fluid
             tag="section"
     >
+        <v-container>
+            <v-row>
+                <v-col>
+                    <v-btn
+                            class="mr-0 float-right"
+                            color="success"
+                            @click="addFile = true"
+                    >
+                        Upload curriculum
+                    </v-btn>
+                </v-col>
+            </v-row>
+        </v-container>
         <v-row justify="center">
-            <v-col
-                    cols="12"
-                    md="8"
-            >
+            <v-col cols="12">
                 <base-material-card>
                     <template v-slot:heading>
                         <div class="display-2 font-weight-light">
-                            Edit Profile
+                            {{action === 'edit' ? $t("edit") : $t("create") }} curriculum
                         </div>
 
                         <div class="subtitle-1 font-weight-light">
-                            Complete your profile
+                            Fill the form
                         </div>
                     </template>
 
@@ -25,109 +34,88 @@
                             <v-row>
                                 <v-col
                                         cols="12"
-                                        md="4"
+                                        md="6"
                                 >
                                     <v-text-field
-                                            label="Company (disabled)"
-                                            disabled
+                                            :disabled="stage !== 0"
+                                            v-model="form.curriculum.major"
+                                            label="Major"
                                     />
                                 </v-col>
-
-                                <v-col
-                                        cols="12"
-                                        md="4"
-                                >
-                                    <v-text-field
-                                            class="purple-input"
-                                            label="User Name"
-                                    />
-                                </v-col>
-
-                                <v-col
-                                        cols="12"
-                                        md="4"
-                                >
-                                    <v-text-field
-                                            label="Email Address"
-                                            class="purple-input"
-                                    />
-                                </v-col>
-
                                 <v-col
                                         cols="12"
                                         md="6"
                                 >
                                     <v-text-field
-                                            label="First Name"
-                                            class="purple-input"
+                                            :disabled="stage !== 0"
+                                            label="Year"
+                                            v-mask="'####'"
+                                            v-model="form.curriculum.year"
+                                            v-on:keyup.enter="stage++"
                                     />
                                 </v-col>
-
-                                <v-col
-                                        cols="12"
-                                        md="6"
-                                >
-                                    <v-text-field
-                                            label="Last Name"
-                                            class="purple-input"
-                                    />
-                                </v-col>
-
-                                <v-col cols="12">
-                                    <v-text-field
-                                            label="Adress"
-                                            class="purple-input"
-                                    />
-                                </v-col>
-
-                                <v-col
-                                        cols="12"
-                                        md="4"
-                                >
-                                    <v-text-field
-                                            label="City"
-                                            class="purple-input"
-                                    />
-                                </v-col>
-
-                                <v-col
-                                        cols="12"
-                                        md="4"
-                                >
-                                    <v-text-field
-                                            label="Country"
-                                            class="purple-input"
-                                    />
-                                </v-col>
-
-                                <v-col
-                                        cols="12"
-                                        md="4"
-                                >
-                                    <v-text-field
-                                            class="purple-input"
-                                            label="Postal Code"
-                                            type="number"
-                                    />
-                                </v-col>
-
-                                <v-col cols="12">
-                                    <v-textarea
-                                            class="purple-input"
-                                            label="About Me"
-                                            value="Lorem ipsum dolor sit amet, consectetur adipiscing elit."
-                                    />
-                                </v-col>
-
-                                <v-col
-                                        cols="12"
-                                        class="text-right"
-                                >
+                            </v-row>
+                            <v-row>
+                                <v-col>
                                     <v-btn
                                             color="success"
-                                            class="mr-0"
+                                            class="mr-0 float-right"
+                                            :disabled="form.curriculum.major.length === 0 ||
+                                             form.curriculum.year.length === 0"
+                                            :class="{ 'd-none': stage!==0 }"
+                                            @click="stage++"
                                     >
-                                        Update Profile
+                                        Next
+                                    </v-btn>
+                                    <v-btn
+                                    color="success"
+                                    class="mr-0 float-right"
+                                    :class="{ 'd-none': stage===0 }"
+                                    @click="stage--"
+                                    >
+                                        Edit Major/Year
+                                    </v-btn>
+                                </v-col>
+                            </v-row>
+                            <v-row
+                                    :class="{'d-none': stage !== 1}">
+                                <v-col cols="12" md="6">
+                                    <v-text-field
+                                            v-model="courseToAdd.code"
+                                            label="Course code"
+                                    />
+                                </v-col>
+                                <v-col cols="12" md="6">
+                                    <v-text-field
+                                            v-model="courseToAdd.name"
+                                            label="Course name"
+                                    />
+                                </v-col>
+                                <v-col cols="12" md="6">
+                                    <v-text-field
+                                            v-model="courseToAdd.type"
+                                            label="Course type"
+                                    />
+                                </v-col>
+                                <v-col cols="12" md="6">
+                                    <v-text-field
+                                            v-model="courseToAdd.credits"
+                                            type="number"
+                                            label="Course credits"
+                                    />
+                                </v-col>
+                            </v-row>
+                            <v-row
+                            :class="{'d-none': stage !==1 }">
+                                <v-col>
+                                    <v-btn
+                                            color="success"
+                                            class="mr-0 float-right"
+                                            @click="addCourse"
+                                            :disabled="!(courseToAdd.name && courseToAdd.type &&
+                                             courseToAdd.code && courseToAdd.credits)"
+                                    >
+                                        Add course
                                     </v-btn>
                                 </v-col>
                             </v-row>
@@ -135,39 +123,120 @@
                     </v-form>
                 </base-material-card>
             </v-col>
-
-            <v-col
-                    cols="12"
-                    md="4"
-            >
-                <base-material-card
-                        class="v-card-profile"
-                        avatar="https://demos.creative-tim.com/vue-material-dashboard/img/marc.aba54d65.jpg"
-                >
-                    <v-card-text class="text-center">
-                        <h6 class="display-1 mb-1 grey--text">
-                            CEO / CO-FOUNDER
-                        </h6>
-
-                        <h4 class="display-2 font-weight-light mb-3 black--text">
-                            Alec Thompson
-                        </h4>
-
-                        <p class="font-weight-light grey--text">
-                            Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...
-                        </p>
-
-                        <v-btn
-                                color="success"
-                                rounded
-                                class="mr-0"
-                        >
-                            Follow
-                        </v-btn>
-                    </v-card-text>
-                </base-material-card>
-            </v-col>
         </v-row>
+        <base-material-card
+                v-if="form.curriculum.courses.length !== 0"
+                title="Courses List"
+                class="px-5 py-3"
+        >
+            <v-simple-table>
+                <thead>
+                <tr>
+                    <th class="primary--text display-1">
+                        Course code
+                    </th>
+                    <th class="primary--text display-1">
+                        Course name
+                    </th>
+                    <th class="primary--text display-1">
+                        Course type
+                    </th>
+                    <th class="primary--text display-1">
+                        Credits
+                    </th>
+                    <th></th>
+
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr v-for="(course, index) in form.curriculum.courses" :key="index" >
+                    <td>{{course.code}}</td>
+                    <td>{{course.name}}</td>
+                    <td>{{course.type}}</td>
+                    <td>{{course.credits}}</td>
+                    <td class="text-right">
+                        <v-tooltip open-delay="83" bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                        @click="removeCourse(index)"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        class="mx-1">
+                                    mdi-close
+                                </v-icon>
+                            </template>
+                            <span>Remove</span>
+                        </v-tooltip>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Total Credits</td>
+                    <td>{{totalCredits}}</td>
+                </tr>
+                </tbody>
+            </v-simple-table>
+        </base-material-card>
+        <v-dialog
+                v-model="addFile"
+                max-width="600">
+            <v-card>
+                <v-card-title class="display-2">
+                    Upload Curriculum
+                    <v-spacer />
+
+                    <v-icon
+                            aria-label="Close"
+                            @click="addFile = false"
+                    >
+                        mdi-close
+                    </v-icon>
+                </v-card-title>
+
+                <v-card-text>
+                    <v-file-input
+                            v-model="file"
+                            show-size
+                            counter
+                            placeholder="Select file"
+                            prepend-icon="mdi-paperclip"
+                            outlined
+                            accept=".xlsx"
+                    >
+                        <template v-slot:selection="{ index, text }">
+                            <v-chip
+                                    v-if="index < 2"
+                                    dark
+                                    label
+                                    small
+                            >
+                                {{ text }}
+                            </v-chip>
+                        </template>
+                    </v-file-input>
+                </v-card-text>
+
+                <v-divider></v-divider>
+
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                            color="primary"
+                            text
+                            @click="addFile = false, submitFile()"
+                    >
+                        Ok
+                    </v-btn>
+                    <v-btn
+                            color="primary"
+                            text
+                            @click="addFile = false"
+                    >
+                        Close
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
@@ -177,7 +246,51 @@
 
       data () {
         return {
-          form: {}
+          form: {
+            curriculum: {
+              id: '',
+              year: '',
+              major: '',
+              courses: []
+            }
+          },
+          courseToAdd:{
+            code: '',
+            name: '',
+            type: '',
+            credits: ''
+          },
+          stage: 0,
+          addFile: false,
+          file: {}
+        }
+      },
+
+      methods: {
+        addCourse(){
+          this.form.curriculum.courses.push(this.courseToAdd);
+          this.courseToAdd = {};
+          this.scrollToEnd();
+        },
+
+        removeCourse(index){
+          this.form.curriculum.courses.splice(index,1);
+        },
+
+        scrollToEnd(){
+          window.scrollTo(0, document.body.scrollHeight || document.documentElement.scrollHeight);
+        },
+
+        submitFile(){
+
+        }
+      },
+
+      computed: {
+        totalCredits() {
+          let sum = 0;
+          this.form.curriculum.courses.forEach(x => sum+=parseInt(x.credits));
+          return sum;
         }
       }
     }

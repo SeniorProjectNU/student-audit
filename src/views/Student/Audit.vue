@@ -4,32 +4,33 @@
     fluid
     tag="section"
   >
-  <v-row>
-  <v-col
-    cols="12"
-    sm="6"
-    lg="3"
-  >
-    <base-material-stats-card
-      color="info"
-      icon="mdi-account-details"
-      :title=student.id
-      :value=student.name
-    />
-  </v-col>
-  <v-spacer/>
-  <v-col
-    cols="2">
-    <v-btn
-      color="success"
-      @click="downloadAudit( )"
-    >
-    Download
-    <v-icon>
-      mdi-download
-    </v-icon>
-    </v-btn>
-  </v-col>
+    <v-row class="text-right">
+      <v-spacer></v-spacer>
+      <v-col cols="6" md="2">
+          <v-btn
+            color="success"
+            @click="downloadAudit( )"
+          >
+            Download
+            <v-icon>
+              mdi-download
+            </v-icon>
+          </v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col
+        cols="12"
+        sm="6"
+        lg="3"
+      >
+        <base-material-stats-card
+          color="info"
+          icon="mdi-account-details"
+          :title=student.id
+          :value=student.name
+        />
+      </v-col>
   </v-row>
     <v-row>
       <v-col
@@ -84,39 +85,80 @@
       title="Audit"
       class="px-5 py-3"
     >
-      <v-simple-table selectable>
+      <v-simple-table>
         <thead>
           <tr>
-            <th class="display-1">Required Course</th>
-            <th class="display-1">Credits</th>
-            <th class="display-1">Taken</th>
-            <th class="display-1">Credits</th>
-            <th class="display-1">Grade</th>
+            <th class="primary--text display-1">Required Course</th>
+            <th class="primary--text display-1">Credits</th>
+            <th class="primary--text display-1">Taken</th>
+            <th class="primary--text display-1">Credits</th>
+            <th class="primary--text display-1">Grade</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="item in audit"
-              :key="item.id"
-              :item="item">
+          <tr v-for="course in tableInfo"
+              :key="course.id">
+              <td>
+                {{course.req.name}}
+              </td>
+              <td>
+                {{course.req.credits}}
+              </td>
+              <td>
+                <div v-if="course.taken.name === course.req.name">
+                  <v-icon
+                    color="success"
+                    class="mx-1">
+                    mdi-checkbox-marked-circle-outline
+                  </v-icon>
+                </div>
+                <div v-else-if="course.taken.name">
+                  {{course.taken.name}}
+                </div>
+                <div v-else>
+                  <v-icon
+                    color="error"
+                    class="mx-1">
+                    mdi-close-circle-outline
+                  </v-icon>
+                </div>
+              </td>
+              <td>
+                {{course.taken.credits}}
+              </td>
+              <td>
+                <div v-for="(grade, index) in course.taken.grades"
+                  :key="index">
+                  {{grade}} 
+                </div>
+              </td>
+          </tr>
+          <tr>
+            <td>
+              Total credits taken
+            </td>
+            <td>
+              {{taken}}
+            </td>
+            <td>
+              Total credits earned
+            </td>
+            <td>
+              {{earned}}
+            </td>
           </tr>
         </tbody>
       </v-simple-table>
-      <v-row>
-        <v-col>
-          Total credits taken: {{taken}}
-        </v-col>
-        <v-col>
-          Total credits earned: {{earned}}
-        </v-col>
-      </v-row>
     </base-material-card>
   </v-container>
 </template>
 
 <script>
   export default {
-    name: 'DashboardDashboard',
+    name: 'StudentAudit',
+    props: [ 'id' ],
+
     data () {
       return {
         // TODO: data for table
@@ -125,17 +167,19 @@
         student: {},
         semesterGPAchart: {},
         courseGPAchart: {},
+        tableInfo: [],
       }
     },
+    
     methods: {
       // TODO: get data from back
       getStudentInfo() {
         this.student = {
-          name: 'Aizhan Uristembek',
+          name: 'Anna Ivanova',
           id: 201687073,
           major: 'Computer Science',
           year: 2021,
-          mail: 'aizhan.uristembek@nu.edu.kz',
+          mail: 'anna.ivanova@nu.edu.kz',
         }
       },
       getSemesterChart() {
@@ -196,7 +240,50 @@
         }
       },
       getReport() {
-
+        this.taken = 34
+        this.earned = 20
+        this.tableInfo = [
+          {
+            req: {
+              name: "CSCI 152 - Programming for beginners",
+              credits: 8,
+            },
+            taken: {
+              name: "CSCI 152 - Programming for beginners",
+              credits: 8,
+              grades: [ "B+" ]
+            }
+          },
+          {
+            req: {
+              name: "Natural science elective",
+              credits: 6,
+            },
+            taken: {
+              name: "BIOL 110 - Modern Biology I",
+              credits: 8,
+              grades: [ "F", "A" ]
+            }
+          },
+          {
+            req: {
+              name: "CSCI 409 - Senior project",
+              credits: 6,
+            },
+            taken: {}
+          },
+          {
+            req: {
+              name: "CSCI 272 - Algorithms",
+              credits: 6,
+            },
+            taken: {
+              name: "CSCI 272 - Algorithms",
+              credits: 6,
+              grades: [ "W", "B" ]
+            }
+          }
+        ]
       },
       downloadAudit( ) {
         // TODO: try after Nurken imports axios
@@ -216,6 +303,7 @@
         }); */
       },
     },
+
     created() {
       this.getStudentInfo()
       this.getCourseChart()

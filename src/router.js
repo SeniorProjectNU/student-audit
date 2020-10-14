@@ -41,18 +41,19 @@ export default new Router({
         {
           name: 'Compare Students',
           path: '/students-comparison/',
-          query: ':id',
+          props: route => ({ id: route.query.id }),
           component: () => import('@/views/Student/Comparison'),
         },
         {
           name: 'Template mails',
           path: '/mails-list',
-          component: () => import('@/views/TemplateMails/List'),
+          component: () => import('@/views/Mail/List'),
         },
         {
-          name: 'Mail modification',
-          path: '/modify-mail/:id',
-          component: () => import('@/views/TemplateMails/Modify')
+          name: 'Mail',
+          path: '/modify-mail',
+          props: route => ({ action: route.query.action, id: route.query.id }),
+          component: () => import('@/views/Mail/Modify')
         }
       ],
     },

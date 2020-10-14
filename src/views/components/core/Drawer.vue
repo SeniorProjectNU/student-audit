@@ -125,11 +125,12 @@
           to: '/students-list',
           group: 'student'
         },
-        // {
-        //   icon: 'mdi-email-multiple-outline',
-        //   title: 'Template mails',
-        //   to: '/mails-list',
-        // }
+        {
+          icon: 'mdi-email-multiple-outline',
+          title: 'Template mails',
+          to: '/mails-list',
+          group: 'mail'
+        }
       ],
     }),
 

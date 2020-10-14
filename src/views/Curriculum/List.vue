@@ -54,7 +54,7 @@
                     <td>{{plan.major}}</td>
                     <td>{{plan.year}}</td>
                     <td class="text-right">
-                        <router-link tag="button" :to="{ name: 'Curriculum', query: { action: 'edit' } }">
+                        <router-link tag="button" :to="{ name: 'Curriculum', query: { action: 'edit' }, params: {id: plan.id} }">
                             <v-tooltip open-delay="83" bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-icon
@@ -90,6 +90,8 @@
 </template>
 
 <script>
+    import { get } from '../../helpers/api'
+
     export default {
 
       data () {
@@ -106,38 +108,9 @@
         getCurriculums() {
           let _this = this;
 
-          _this.curriculums = [
-            {
-              major: 'Computer Science',
-              year: 2012,
-              id: 1
-            },
-            {
-              major: 'Political Science',
-              year: 2042,
-              id: 2
-            },
-            {
-              major: 'Physics',
-              year: 2011,
-              id: 3
-            },
-            {
-              major: 'Basketball',
-              year: 2022,
-              id: 4
-            },
-            {
-              major: 'Robotics',
-              year: 2018,
-              id: 5
-            },
-            {
-              major: 'German language',
-              year: 2030,
-              id: 6
-            },
-          ]
+          get(_this, '/curriculum', '', response=>{
+            _this.curriculums = response.data;
+          })
         },
         deleteCurriculum(id, index){
           let _this = this;

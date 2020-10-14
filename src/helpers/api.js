@@ -1,8 +1,7 @@
 import axios from 'axios'
-axios.defaults.baseURL = 'https://api.example.com';
+axios.defaults.baseURL = 'http://178.62.206.207:8080';
 
-export function post(_this, url, payload, successCallback, errorCallback) {
-    let headers = _this.$auth.getToken() ? {'Authorization': `Bearer ${_this.$auth.getToken()}`} : '';
+export function post(_this, url, payload, successCallback, errorCallback, headers = '') {
 
     return axios({
         method: 'POST',
@@ -21,7 +20,7 @@ export function post(_this, url, payload, successCallback, errorCallback) {
 }
 
 export function get(_this, url, payload, successCallback, errorCallback) {
-    let headers = _this.$auth.getToken() ? {'Authorization': `Bearer ${_this.$auth.getToken()}`} : '';
+    let headers = '';
 
     return axios({
         method: 'GET',

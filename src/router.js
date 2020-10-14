@@ -24,7 +24,7 @@ export default new Router({
         },
         {
           name: 'Curriculum',
-          path: '/curriculum',
+          path: '/curriculum/:id',
           props: route => ({ action: route.query.action }),
           component: () => import('@/views/Curriculum/Index'),
         },

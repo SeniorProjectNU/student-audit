@@ -48,12 +48,11 @@
           <tr v-for="(student) in sortedStudents"
               :key="student.id">
             <td><input type="checkbox" :value=student.id v-model="selectedStudents"/></td>
-            <td>{{student.id}}</td>
-            <td> <router-link tag="button" :to="{ name: 'Student Audit', params: { id: student.id } }">
-            {{student.name}}</router-link></td>
-            <td>{{student.GPA}}</td>
-            <td>{{student.major}}</td>
-            <td>{{student.year}}</td>
+            <td @click="goToAudit( student.id )">{{student.id}}</td>
+            <td @click="goToAudit( student.id )">{{student.name}}</td>
+            <td @click="goToAudit( student.id )">{{student.GPA}}</td>
+            <td @click="goToAudit( student.id )">{{student.major}}</td>
+            <td @click="goToAudit( student.id )">{{student.year}}</td>
             <td class="text-right">
               <v-tooltip open-delay="83" bottom>
                 <template v-slot:activator="{ on, attrs }">
@@ -371,6 +370,10 @@ export default {
       var student = this.students.find(s => s.id === id )
       this.students.splice( this.students.indexOf( student ), 1 )
     },
+    // router
+    goToAudit( id ){
+      this.$router.push({ name: 'Student Audit', params: { id: id } })
+    }
   },
 
   created() {

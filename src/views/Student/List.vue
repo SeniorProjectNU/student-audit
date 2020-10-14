@@ -4,18 +4,8 @@
     fluid
     tag="section"
   >
-  <v-row>
-    <v-col
-      cols="3">
-        <v-btn
-          color="success"
-          @click="addFiles=true">
-          Add student transcript
-        </v-btn>
-    </v-col>
-    <v-spacer/>
-    <v-col
-      cols="2">
+  <v-row justify="space-between">
+    <v-col cols="6" md="2">
       <v-select v-model="pageSize"
         :items ="pageSizeOptions"
         prepend-icon="mdi-format-align-justify"
@@ -26,41 +16,58 @@
       >
       </v-select>
     </v-col>
+    <v-spacer/>
+    <v-col cols="6" md="2">
+        <v-btn
+          color="success"
+          @click="addFiles=true">
+          Add transcript
+        </v-btn>
+    </v-col>
   </v-row>
 
     <base-material-card
-      icon="mdi-clipboard-text"
-      title="Students list"
+      icon="mdi-account-group"
+      title="Student list"
       class="px-5 py-3"
     >
-      <v-simple-table selectable>
+      <v-simple-table>
         <thead>
           <tr>
-            <th><input type="checkbox" @click="selectAll" v-model="selectedStudents"/>
-            <label></label></th>
-            <th class="display-1" @click="sort('id')">ID</th>
-            <th class="display-1" @click="sort('name')">Name</th>
-            <th class="display-1" @click="sort('GPA')">Cumulative GPA</th>
-            <th class="display-1" @click="sort('major')">Major</th>
-            <th class="display-1" @click="sort('year')">Year</th>
-            <th class="display-1">Remove</th>
+            <th><input class="mr-3" type="checkbox" @click="selectAll" v-model="allSelected"/></th>
+            <th class="primary--text display-1" @click="sort('id')">ID</th>
+            <th class="primary--text display-1" @click="sort('name')">Name</th>
+            <th class="primary--text display-1" @click="sort('GPA')">cGPA</th>
+            <th class="primary--text display-1" @click="sort('major')">Major</th>
+            <th class="primary--text display-1" @click="sort('year')">Year</th>
+            <th></th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="item in sortedStudents"
-              :key="item.id"
-              :item="item">
-            <td><input type="checkbox" :value=item.id v-model="selectedStudents"/>
-            <label></label></td>
-            <td>{{item.id}}</td>
-            <td> <router-link tag="button" :to="{ name: 'Student Audit', params: { id: item.id } }">
-            {{item.name}}</router-link></td>
-            <td>{{item.GPA}}</td>
-            <td>{{item.major}}</td>
-            <td>{{item.year}}</td>
-            <td>
-              <v-icon @click="removeStudent(item.id)">mdi-account-remove</v-icon>
+          <tr v-for="(student) in sortedStudents"
+              :key="student.id">
+            <td><input type="checkbox" :value=student.id v-model="selectedStudents"/></td>
+            <td>{{student.id}}</td>
+            <td> <router-link tag="button" :to="{ name: 'Student Audit', params: { id: student.id } }">
+            {{student.name}}</router-link></td>
+            <td>{{student.GPA}}</td>
+            <td>{{student.major}}</td>
+            <td>{{student.year}}</td>
+            <td class="text-right">
+              <v-tooltip open-delay="83" bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    @click="removeStudent(student.id)"
+                    v-bind="attrs"
+                    v-on="on"
+                    color="error"
+                    class="mx-1">
+                    mdi-delete
+                  </v-icon>
+                </template>
+                <span>Delete</span>
+              </v-tooltip>
             </td>
           </tr>
         </tbody>
@@ -101,7 +108,7 @@
       v-model="addFiles"
       max-width="600">
       <v-card>
-        <v-card-title class="display-2">
+        <v-card-title class="primary--text display-2">
           Add transcripts
         <v-spacer />
       
@@ -168,7 +175,7 @@
       v-model="send"
       max-width="600">
       <v-card>
-        <v-card-title class="display-2">
+        <v-card-title class="primary--text display-2">
           Mails list
 
         <v-spacer />
@@ -216,7 +223,7 @@ export default {
     currentSort: 'Name',
     currentSortDir: 1,
     pageSize: 10,
-    pageSizeOptions: [5, 10, 15, 20, 25, 30],
+    pageSizeOptions: [2, 5, 10, 15, 20, 25, 30],
     currentPage: 1,
     prev: false,
     next: true,
@@ -225,8 +232,10 @@ export default {
     addFiles: false,
     mails: '',
     selectedStudents: [],
+    allSelected: false,
     students: []
   }),
+  
   computed: {
     sortedStudents() {
       return this.students.slice().sort((a,b) => {
@@ -240,19 +249,21 @@ export default {
       });
     },
   },
+
   watch: {
     pageSize() {
       this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
       this.prev = (this.currentPage == 1) ? false : true;
     },
-    selectedStudents() {
-      if( this.selectedStudents.includes( null ) && this.students.length + 1 !== this.selectedStudents.length ) {
-        this.selectedStudents.splice( this.selectedStudents.indexOf( null ) , 1 )
-      } else if( this.selectedStudents.length === this.students.length ) {
-        this.selectedStudents.push( null )
-      }
+    currentPage() {
+      this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
+      this.prev = (this.currentPage == 1) ? false : true;
+    },
+    selectedStudents(val) {
+      this.allSelected = val.length === this.students.length
     }
   },
+
   methods: {
     // get information
     getStudents() {
@@ -295,7 +306,7 @@ export default {
     // sorting
     sort ( col ) {
       if(this.currentSort === col){
-        this.currentSortDir = this.currentSortDir === 1 ? -1 : 1;
+        this.currentSortDir = -1 * this.currentSortDir;
       }else{
         this.currentSort = col;
       }
@@ -304,34 +315,19 @@ export default {
     nextPage() {
       if((this.currentPage*this.pageSize) < this.students.length)
         this.currentPage++;
-      this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
-      this.prev = (this.currentPage == 1) ? false : true;
     },
     prevPage() {
       if(this.currentPage > 1)
         this.currentPage--;
-      this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
-      this.prev = (this.currentPage == 1) ? false : true;
     },
     // selection
-    containsAll() {
-      let count = 0;
-      for( var i = 0; i < this.students.length; i ++ ) {
-        if( this.selectedStudents.includes( this.students[ i ].id ) ) {
-          count ++;
-        }
-      }
-      return this.students.length == count;
-    },
     selectAll( ) {
-      if( !this.containsAll() ) {
-        this.selectedStudents = []
-        for( var i = 0; i < this.students.length; i ++ ) {
-          if( !this.selectedStudents.includes( this.students[ i ].id ) )
-            this.selectedStudents.push( this.students[ i ].id )
-        }
+      this.selectedStudents = []
+      if( !this.allSelected ) {
+        this.allSelected = true
+        this.students.forEach(x => this.selectedStudents.push(x.id))
       } else {
-        this.selectedStudents = [];
+        this.allSelected = false
       }
     },
     // transcript addition
@@ -376,6 +372,7 @@ export default {
       this.students.splice( this.students.indexOf( student ), 1 )
     },
   },
+
   created() {
     this.getStudents();
     this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;

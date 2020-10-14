@@ -4,19 +4,8 @@
     fluid
     tag="section"
   >
-  <v-row>
-    <v-col
-      cols="3">
-      <router-link :to="{ name: 'Mail modification', params: { id: 'new' } }">
-        <v-btn
-          color="success">
-          Create new mail
-        </v-btn>
-      </router-link>
-    </v-col>
-    <v-spacer/>
-    <v-col
-      cols="2">
+  <v-row justify="space-between">
+    <v-col cols="6" md="2">
       <v-select v-model="pageSize"
         :items ="pageSizeOptions"
         prepend-icon="mdi-format-align-justify"
@@ -27,38 +16,68 @@
       >
       </v-select>
     </v-col>
+    <v-spacer/>
+    <v-col cols="6" md="2">
+      <router-link :to="{ name: 'Mail', query: { action: 'create' } }">
+        <v-btn
+          color="success">
+          Create new
+        </v-btn>
+      </router-link>
+    </v-col>
   </v-row>
 
     <base-material-card
-      icon="mdi-clipboard-text"
-      title="Mails list"
+      icon="mdi-email-multiple-outline"
+      title="Mail list"
       class="px-5 py-3"
     >
-      <v-simple-table selectable>
+      <v-simple-table>
         <thead>
           <tr>
-            <th class="display-1">No.</th>
-            <th class="display-1" @click="sort('name')">Name</th>
-            <th class="display-1" @click="sort('text')">Text</th>
-            <th class="display-1">Actions</th>
+            <th class="primary--text display-1">No.</th>
+            <th class="primary--text display-1" @click="sort('name')">Name</th>
+            <th class="primary--text display-1" @click="sort('text')">Text</th>
+            <th></th>
           </tr>
         </thead>
 
         <tbody>
-          <tr v-for="(item, i) in sortedMails"
-              :key="item.id"
-              :item="item">
-            <td>{{i+1}}</td>
-            <td>{{item.name}}</td>
+          <tr v-for="(mail, i) in sortedMails"
+              :key="mail.id">
+            <td>{{(i+1)*currentPage}}</td>
+            <td>{{mail.name}}</td>
             <td>
-              <div v-if="item.text.length < 80"> {{item.text}}</div>
-              <div v-else> {{item.text.substring(0, 80)+'...'}}</div>
+              <div v-if="mail.text.length < 80"> {{mail.text}}</div>
+              <div v-else> {{mail.text.substring(0, 80)+'...'}}</div>
             </td>
-            <td>
-              <router-link :to="{ name: 'Mail modification', params: { id: item.id } }" >
-                <v-icon>mdi-email-edit-outline</v-icon>
+            <td class="text-right">
+              <router-link tag="button" :to="{ name: 'Mail', query: { action: 'edit', id: mail.id } }">
+                <v-tooltip open-delay="83" bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                      v-bind="attrs"
+                      v-on="on"
+                      class="mx-1">
+                        mdi-email-edit-outline
+                    </v-icon>
+                  </template>
+                  <span>Edit</span>
+                </v-tooltip>
               </router-link>
-              <v-icon @click="removeMail(item.id)">mdi-delete</v-icon>
+              <v-tooltip open-delay="83" bottom>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-icon
+                    @click="deleteMail(mail.id)"
+                    v-bind="attrs"
+                    v-on="on"
+                    color="error"
+                    class="mx-1">
+                      mdi-delete
+                  </v-icon>
+                </template>
+                <span>Delete</span>
+              </v-tooltip>
             </td>
           </tr>
         </tbody>
@@ -91,6 +110,7 @@ export default {
     next: true,
     mails: []
   }),
+
   computed: {
     sortedMails() {
       return this.mails.slice().sort((a,b) => {
@@ -104,12 +124,18 @@ export default {
       });
     },
   },
+
   watch: {
     pageSize() {
       this.next = ((this.currentPage*this.pageSize) < this.mails.length) ? true : false;
       this.prev = (this.currentPage == 1) ? false : true;
     },
+    currentPage() {
+      this.next = ((this.currentPage*this.pageSize) < this.students.length) ? true : false;
+      this.prev = (this.currentPage == 1) ? false : true;
+    },
   },
+
   methods: {
     // get information
     getMails() {
@@ -139,17 +165,13 @@ export default {
     nextPage() {
       if((this.currentPage*this.pageSize) < this.mails.length)
         this.currentPage++;
-      this.next = ((this.currentPage*this.pageSize) < this.mails.length) ? true : false;
-      this.prev = (this.currentPage == 1) ? false : true;
     },
     prevPage() {
       if(this.currentPage > 1)
         this.currentPage--;
-      this.next = ((this.currentPage*this.pageSize) < this.mails.length) ? true : false;
-      this.prev = (this.currentPage == 1) ? false : true;
     },
     // remove
-    removeMail( id ) {
+    deleteMail( id ) {
       // TODO: send id and command to backend
       var mail = this.mails.find(s => s.id === id )
       this.mails.splice( this.mails.indexOf( mail ), 1 )

@@ -21,14 +21,14 @@
                 <router-link :to="{ name: 'Curriculum', query: { action: 'create' } }">
                     <v-btn
                         color="success">
-                        Add curriculum
+                        {{$t('curriculum.add')}}
                     </v-btn>
                 </router-link>
             </v-col>
         </v-row>
         <base-material-card
                 icon="mdi-calendar-multiple"
-                title="Curriculum List"
+                :title="$t('curriculum.list')"
                 class="px-5 py-3"
         >
             <v-simple-table>
@@ -38,10 +38,10 @@
                         <input class="mr-3" type="checkbox" @click="selectAll" v-model="allSelected"/>
                     </th>
                     <th class="primary--text display-1">
-                        Major
+                        {{$t('major')}}
                     </th>
                     <th class="primary--text display-1">
-                        Year
+                        {{$t('year')}}
                     </th>
                     <th></th>
 
@@ -65,7 +65,7 @@
                                         mdi-pencil
                                     </v-icon>
                                 </template>
-                                <span>Edit</span>
+                                <span>{{$t('edit')}}</span>
                             </v-tooltip>
                         </router-link>
                         <v-tooltip open-delay="83" bottom>
@@ -79,7 +79,7 @@
                                     mdi-delete
                                 </v-icon>
                             </template>
-                            <span>Delete</span>
+                            <span>{{$t('delete')}}</span>
                         </v-tooltip>
                     </td>
                 </tr>

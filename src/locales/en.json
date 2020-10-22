@@ -31,5 +31,12 @@
   "wizard": "Wizard",
   "add": "Add",
   "edit": "Edit",
-  "create": "Create"
+  "create": "Create",
+  "delete": "Delete",
+  "major": "Major",
+  "year": "Year",
+  "curriculum": {
+    "list": "Curriculum list",
+    "add": "Add curriculum"
+  }
 }

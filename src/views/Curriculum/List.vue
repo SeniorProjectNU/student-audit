@@ -49,8 +49,8 @@
                 </thead>
 
                 <tbody>
-                <tr v-for="(plan, index) in curriculums" :key="index" >
-                    <td><input type="checkbox" :value=plan.id v-model="selectedCurriculums"/>
+                <tr class="cursor-pointer" v-for="(plan, index) in curriculums" :key="index" >
+                    <td><input @click.stop="" type="checkbox" :value=plan.id v-model="selectedCurriculums"/>
                     <td>{{plan.major}}</td>
                     <td>{{plan.year}}</td>
                     <td class="text-right">
@@ -58,6 +58,7 @@
                             <v-tooltip open-delay="83" bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-icon
+                                            @click.stop=""
                                             v-bind="attrs"
                                             v-on="on"
                                             class="mx-1">
@@ -70,7 +71,7 @@
                         <v-tooltip open-delay="83" bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-icon
-                                        @click="deleteCurriculum(plan.id, index)"
+                                        @click.stop="deleteCurriculum(plan.id, index)"
                                         v-bind="attrs"
                                         v-on="on"
                                         color="error"

@@ -45,19 +45,19 @@
         </thead>
 
         <tbody>
-          <tr v-for="(student) in sortedStudents"
+          <tr class="cursor-pointer" @click="goToAudit( student.id )" v-for="(student) in sortedStudents"
               :key="student.id">
-            <td><input type="checkbox" :value=student.id v-model="selectedStudents"/></td>
-            <td @click="goToAudit( student.id )">{{student.id}}</td>
-            <td @click="goToAudit( student.id )">{{student.name}}</td>
-            <td @click="goToAudit( student.id )">{{student.GPA}}</td>
-            <td @click="goToAudit( student.id )">{{student.major}}</td>
-            <td @click="goToAudit( student.id )">{{student.year}}</td>
+            <td><input @click.stop="" type="checkbox" :value=student.id v-model="selectedStudents"/></td>
+            <td>{{student.id}}</td>
+            <td>{{student.name}}</td>
+            <td>{{student.GPA}}</td>
+            <td>{{student.major}}</td>
+            <td>{{student.year}}</td>
             <td class="text-right">
               <v-tooltip open-delay="83" bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon
-                    @click="removeStudent(student.id)"
+                    @click.stop="removeStudent(student.id)"
                     v-bind="attrs"
                     v-on="on"
                     color="error"

@@ -71,7 +71,7 @@
                         <v-tooltip open-delay="83" bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-icon
-                                        @click.stop="deleteModal([plan.id])"
+                                        @click.stop="showDeleteModal([plan.id])"
                                         v-bind="attrs"
                                         v-on="on"
                                         color="error"
@@ -79,14 +79,18 @@
                                     mdi-delete
                                 </v-icon>
                             </template>
-                            <span>{{$t('delete')}}</span>
+                            <span>{{$t('delete.text')}}</span>
                         </v-tooltip>
                     </td>
                 </tr>
                 </tbody>
             </v-simple-table>
         </base-material-card>
-        <DeleteModal disabled ref="delete" :number="selectedToDelete.length" @submit="deleteCurriculum(selectedToDelete)"></DeleteModal>
+        <DeleteModal
+                disabled ref="delete"
+                :number="selectedToDelete.length"
+                @submit="deleteCurriculum">
+        </DeleteModal>
     </v-container>
 </template>
 
@@ -119,11 +123,13 @@
             _this.curriculums = response.data;
           })
         },
-        deleteModal(ids){
+        showDeleteModal(ids){
           this.selectedToDelete = ids;
           this.$refs.delete.showModal();
         },
-        deleteCurriculum(ids){
+        deleteCurriculum(val){
+          if (val)
+            console.log("request delete");
           this.$refs.delete.closeModal()
         },
         selectAll() {

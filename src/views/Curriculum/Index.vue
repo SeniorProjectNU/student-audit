@@ -73,10 +73,10 @@
 
                                     <v-tab-item>
                                         <v-container>
-                                            <v-row>
+                                            <v-row justify="center">
                                                 <v-col>
                                                     <v-btn
-                                                            class="mr-0 float-right"
+                                                            class="mr-0"
                                                             color="success"
                                                             @click="addFile = true"
                                                     >

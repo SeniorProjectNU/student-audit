@@ -71,7 +71,7 @@
                         <v-tooltip open-delay="83" bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-icon
-                                        @click.stop="deleteCurriculum(plan.id, index)"
+                                        @click.stop="deleteModal([plan.id])"
                                         v-bind="attrs"
                                         v-on="on"
                                         color="error"
@@ -86,19 +86,25 @@
                 </tbody>
             </v-simple-table>
         </base-material-card>
-
+        <DeleteModal disabled ref="delete" :number="selectedToDelete.length" @submit="deleteCurriculum(selectedToDelete)"></DeleteModal>
     </v-container>
 </template>
 
 <script>
     import { get } from '../../helpers/api'
 
+    import DeleteModal from '../common/modal/DeleteModal.vue'
+
     export default {
+      components: {
+        DeleteModal
+      },
 
       data () {
         return {
           curriculums: [],
           selectedCurriculums: [],
+          selectedToDelete: [],
           allSelected: false,
           pageSize: 10,
           pageSizeOptions: [5, 10, 15, 20, 25, 30],
@@ -113,9 +119,12 @@
             _this.curriculums = response.data;
           })
         },
-        deleteCurriculum(id, index){
-          let _this = this;
-          _this.curriculums.splice(index, 1);
+        deleteModal(ids){
+          this.selectedToDelete = ids;
+          this.$refs.delete.showModal();
+        },
+        deleteCurriculum(ids){
+          this.$refs.delete.closeModal()
         },
         selectAll() {
           this.selectedCurriculums = [];

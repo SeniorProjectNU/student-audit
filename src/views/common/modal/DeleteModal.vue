@@ -2,7 +2,7 @@
     <div class="text-center">
         <v-dialog
         v-model="show"
-        max-width="500">
+        max-width="350">
             <v-card>
                 <v-card-title class="headline red--text">
                     {{$t('warning')}}
@@ -11,9 +11,9 @@
                     {{$t('delete.warning')}} {{number}} {{$t('delete.items')}}?
                 </v-card-text>
                 <v-divider></v-divider>
-                <v-card-actions>
+                <v-card-actions class="flex justify-space-between">
                     <v-btn color="blue darken-1" @click="submit(false)">{{$t('no')}}</v-btn>
-                    <v-btn color="blue darken-1" @click="submit(true)">{{$t('yes')}}</v-btn>
+                    <v-btn color="blue darken-1 mr-0" @click="submit(true)">{{$t('yes')}}</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>

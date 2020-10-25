@@ -32,6 +32,7 @@
   },
   "curriculum": {
     "list": "Curriculum list",
-    "add": "Add curriculum"
+    "add": "Add curriculum",
+    "curriculum": "Curriculum"
   }
 }

@@ -25,8 +25,19 @@ export default new Router({
         {
           name: 'Curriculum',
           path: '/curriculum/:id',
-          props: route => ({ action: route.query.action }),
           component: () => import('@/views/Curriculum/Index'),
+        },
+        {
+          name: 'Curriculum-edit',
+          path: '/curriculum/edit/:id',
+          props: route => ({ action: route.query.action }),
+          component: () => import('@/views/Curriculum/Edit'),
+        },
+        {
+          name: 'Curriculum-create',
+          path: '/curriculum/create',
+          props: route => ({ action: route.query.action }),
+          component: () => import('@/views/Curriculum/Edit'),
         },
         {
           name: 'Students',

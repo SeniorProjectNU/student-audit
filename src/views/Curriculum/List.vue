@@ -16,14 +16,29 @@
                 >
                 </v-select>
             </v-col>
-            <v-spacer/>
-            <v-col cols="6" md="2">
-                <router-link :to="{ name: 'Curriculum', query: { action: 'create' } }">
-                    <v-btn
-                        color="success">
-                        {{$t('curriculum.add')}}
-                    </v-btn>
-                </router-link>
+            <v-col cols="6" md="4">
+                <v-row no-gutters>
+                    <v-col>
+                        <v-btn
+                                @click="showDeleteModal(selectedCurriculums)"
+                                :class="{'d-none': selectedCurriculums.length === 0}"
+                                color="success">
+                            {{$t('delete.text')}}
+                            <v-icon
+                                    class="mx-1">
+                                mdi-delete
+                            </v-icon>
+                        </v-btn>
+                    </v-col>
+                    <v-col>
+                        <router-link :to="{ name: 'Curriculum-create'}">
+                            <v-btn
+                                    color="success">
+                                {{$t('curriculum.add')}}
+                            </v-btn>
+                        </router-link>
+                    </v-col>
+                </v-row>
             </v-col>
         </v-row>
         <base-material-card
@@ -49,25 +64,23 @@
                 </thead>
 
                 <tbody>
-                <tr class="cursor-pointer" v-for="(plan, index) in curriculums" :key="index" >
+                <tr @click="$router.push({name: 'Curriculum', params: {id: plan.id}})" class="cursor-pointer" v-for="(plan, index) in curriculums" :key="index" >
                     <td><input @click.stop="" type="checkbox" :value=plan.id v-model="selectedCurriculums"/>
                     <td>{{plan.major}}</td>
                     <td>{{plan.year}}</td>
                     <td class="text-right">
-                        <router-link tag="button" :to="{ name: 'Curriculum', query: { action: 'edit' }, params: {id: plan.id} }">
-                            <v-tooltip open-delay="83" bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-icon
-                                            @click.stop=""
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            class="mx-1">
-                                        mdi-pencil
-                                    </v-icon>
-                                </template>
-                                <span>{{$t('edit')}}</span>
-                            </v-tooltip>
-                        </router-link>
+                        <v-tooltip open-delay="83" bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                        @click.stop="$router.push({ name: 'Curriculum-edit', params: {id: plan.id} })"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                        class="mx-1">
+                                    mdi-pencil
+                                </v-icon>
+                            </template>
+                            <span>{{$t('edit')}}</span>
+                        </v-tooltip>
                         <v-tooltip open-delay="83" bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-icon
@@ -111,7 +124,7 @@
           selectedToDelete: [],
           allSelected: false,
           pageSize: 10,
-          pageSizeOptions: [5, 10, 15, 20, 25, 30],
+          pageSizeOptions: [10, 25, 50, 100],
         }
       },
 

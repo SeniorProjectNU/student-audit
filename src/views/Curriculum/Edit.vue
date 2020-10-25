@@ -69,7 +69,7 @@
                             <v-card>
                                 <v-tabs vertical>
                                     <v-tab>Upload</v-tab>
-                                    <v-tab>Create manually</v-tab>
+                                    <v-tab>Manual</v-tab>
 
                                     <v-tab-item>
                                         <v-container>
@@ -89,54 +89,31 @@
                                     <v-tab-item>
                                         <v-container class="py-0">
                                             <v-row
-                                                    :class="{'d-none': stage !== 1}">
-                                                <v-col cols="12" md="6">
-                                                    <v-text-field
-                                                            v-model="courseToAdd.code"
-                                                            label="Course code"
-                                                    />
-                                                </v-col>
-                                                <v-col cols="12" md="6">
-                                                    <v-text-field
-                                                            v-model="courseToAdd.name"
-                                                            label="Course name"
-                                                    />
-                                                </v-col>
-                                                <v-col cols="12" md="6">
-                                                    <v-text-field
-                                                            v-model="courseToAdd.type"
-                                                            label="Course type"
-                                                    />
-                                                </v-col>
-                                                <v-col cols="12" md="6">
-                                                    <v-text-field
-                                                            v-model="courseToAdd.credits"
-                                                            type="number"
-                                                            label="Course credits"
-                                                    />
-                                                </v-col>
-                                            </v-row>
-                                            <v-row
+                                                    justify="end"
                                                     :class="{'d-none': stage !==1 }">
-                                                <v-col>
-                                                    <v-btn
-                                                            color="success"
-                                                            class="mr-0 float-right"
-                                                            @click="addCourse"
-                                                            :disabled="!(courseToAdd.name && courseToAdd.type &&
-                                             courseToAdd.code && courseToAdd.credits)"
-                                                    >
-                                                        Add course
-                                                    </v-btn>
-                                                </v-col>
+                                                <v-col cols="3"><v-btn color="white">Total credits: {{totalCredits}}</v-btn></v-col>
+                                                <v-col cols="2">
+                                                <v-btn
+                                                        color="success"
+                                                        class="mr-0 float-right"
+                                                        @click="addCourse"
+                                                >
+                                                    Add slot
+                                                </v-btn>
+                                            </v-col>
+                                                <v-col cols="2">
+                                                <v-btn
+                                                        color="success"
+                                                        class="mr-0 float-right"
+                                                >
+                                                    Save
+                                                </v-btn>
+                                            </v-col>
                                             </v-row>
                                         </v-container>
-                                        <v-simple-table>
+                                        <v-simple-table fixed-header height="600px">
                                             <thead>
                                             <tr>
-                                                <th class="primary--text display-1">
-                                                    Course code
-                                                </th>
                                                 <th class="primary--text display-1">
                                                     Course name
                                                 </th>
@@ -150,13 +127,21 @@
 
                                             </tr>
                                             </thead>
-
                                             <tbody>
                                             <tr v-for="(course, index) in form.curriculum.requirements" :key="index" >
-                                                <td>{{course.code}}</td>
-                                                <td>{{course.name}}</td>
-                                                <td>{{course.type}}</td>
-                                                <td>{{course.credits}}</td>
+                                                <td><v-text-field
+                                                        v-model="course.name"
+                                                        label="Course name"
+                                                /></td>
+                                                <td><v-text-field
+                                                        v-model="course.type.name"
+                                                        label="Course type"
+                                                /></td>
+                                                <td><v-text-field
+                                                        v-model="course.credit"
+                                                        label="Credits"
+                                                        type="number"
+                                                /></td>
                                                 <td class="text-right">
                                                     <v-tooltip open-delay="83" bottom>
                                                         <template v-slot:activator="{ on, attrs }">
@@ -172,20 +157,12 @@
                                                     </v-tooltip>
                                                 </td>
                                             </tr>
-                                            <tr>
-                                                <td>Total Credits</td>
-                                                <td>{{totalCredits}}</td>
-                                            </tr>
                                             </tbody>
                                         </v-simple-table>
                                     </v-tab-item>
 
                                 </v-tabs>
                             </v-card>
-                            <v-container>
-
-
-                            </v-container>
                         </v-tab-item>
                         <v-tab-item>
                             <v-card flat>
@@ -322,12 +299,6 @@
               requirements: []
             }
           },
-          courseToAdd:{
-            code: '',
-            name: '',
-            type: '',
-            credits: ''
-          },
           stage: 0,
           addFile: false,
           files: []
@@ -354,9 +325,14 @@
         },
 
         addCourse(){
-          this.form.curriculum.requirements.push(this.courseToAdd);
-          this.courseToAdd = {};
-          this.scrollToEnd();
+          let c = {
+            name: '',
+            type: {
+              name:''
+            },
+            credit: ''
+          };
+          this.form.curriculum.requirements.push(c);
         },
 
         removeCourse(index){
@@ -401,7 +377,7 @@
       computed: {
         totalCredits() {
           let sum = 0;
-          this.form.curriculum.requirements.forEach(x => sum+=parseInt(x.credits));
+          this.form.curriculum.requirements.forEach(x => sum+=parseInt(x.credit));
           return sum;
         },
         totalCreditsParsed() {

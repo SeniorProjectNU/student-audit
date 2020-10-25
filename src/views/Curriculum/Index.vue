@@ -5,7 +5,7 @@
         <v-row justify="end">
             <v-col cols="1">
                 <v-btn
-                        @click="$router.push('')"
+                        @click="$router.push({ name: 'Curriculum-edit', params: {id: curriculum.id} })"
                         color="success"
                 >
                     {{$t('edit')}}

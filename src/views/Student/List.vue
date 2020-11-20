@@ -35,24 +35,24 @@
         <thead>
           <tr>
             <th><input class="mr-3" type="checkbox" @click="selectAll" v-model="allSelected"/></th>
-            <th class="primary--text display-1" @click="sort('id')">ID</th>
+            <th class="primary--text display-1" @click="sort('studentId')">ID</th>
             <th class="primary--text display-1" @click="sort('name')">Name</th>
-            <th class="primary--text display-1" @click="sort('GPA')">cGPA</th>
+            <th class="primary--text display-1" @click="sort('gpa')">cGPA</th>
             <th class="primary--text display-1" @click="sort('major')">Major</th>
-            <th class="primary--text display-1" @click="sort('year')">Year</th>
+            <th class="primary--text display-1" @click="sort('admissionSemester')">Year enrolled</th>
             <th></th>
           </tr>
         </thead>
 
         <tbody>
-          <tr class="cursor-pointer" @click="goToAudit( student.id )" v-for="(student) in sortedStudents"
+          <tr class="cursor-pointer" @click="goToAudit(student.id)" v-for="(student) in sortedStudents"
               :key="student.id">
             <td><input @click.stop="" type="checkbox" :value=student.id v-model="selectedStudents"/></td>
-            <td>{{student.id}}</td>
+            <td>{{student.studentId}}</td>
             <td>{{student.name}}</td>
-            <td>{{student.GPA}}</td>
+            <td>{{student.gpa}}</td>
             <td>{{student.major}}</td>
-            <td>{{student.year}}</td>
+            <td>{{student.admissionSemester}}</td>
             <td class="text-right">
               <v-tooltip open-delay="83" bottom>
                 <template v-slot:activator="{ on, attrs }">
@@ -156,14 +156,14 @@
           <v-btn
             color="primary"
             text
-            @click="addFiles = false, submitFiles()"
+            @click="submitFiles()"
           >
             Ok
           </v-btn>
           <v-btn
             color="primary"
             text
-            @click="addFiles = false"
+            @click="addFiles = false, files = []"
           >
             Close
           </v-btn>
@@ -215,9 +215,8 @@
 </template>
 
 <script>
+import { get, post } from '../../helpers/api'
 export default {
-  name: 'StudentsList',
-
   data: () => ({
     currentSort: 'Name',
     currentSortDir: 1,
@@ -266,41 +265,9 @@ export default {
   methods: {
     // get information
     getStudents() {
-      // TODO: get data from backend
-      this.students = [
-      {
-        id: 201687073,
-        name: 'Aizhan Uristembek',
-        major: 'Computer Science',
-        year: 2020,
-        mail: 'aizhan.uristembek@nu.edu.kz',
-        GPA: 3.50.toFixed(2),
-      },
-      {
-        id: 201514864,
-        name: 'Ivan Ivanov',
-        major: 'Computer Science',
-        year: 2021,
-        mail: 'ivan@gmail.com',
-        GPA: 4.00.toFixed(2),
-      },
-      {
-        id: 201743154,
-        name: 'Karina Smith',
-        major: 'Computer Science',
-        year: 2022,
-        mail: 'karina@gmail.com',
-        GPA: 3.99,
-      },
-      {
-        id: 201623785,
-        name: 'Elizabeth Turner',
-        major: 'Computer Science',
-        year: 2021,
-        mail: 'liz@gmail.com',
-        GPA: 2.57,
-      },
-    ]
+      get(this, '/transcript/all', '', response=>{
+        this.students = response.data;
+      })
     },
     // sorting
     sort ( col ) {
@@ -328,31 +295,28 @@ export default {
       } else {
         this.allSelected = false
       }
+      console.log(this.sortedStudents);
     },
     // transcript addition
     submitFiles() {
       if ( this.files.length != 0 ) {
         let formData = new FormData();
-        formData.append('transcripts', JSON.stringify( this.files ) );
-        // TODO: send to back
-        /*axios.post("/",
-          formData, 
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }
-          ).then(response => {
-            console.log("Success!");
-            console.log({ response });
-          })
-          .catch(error => {
-            console.log({ error });
-          });*/
+        // TODO: change for multiple files
+        formData.append('file', this.files[0]);
+
+        post(this, '/transcript', formData, response => {
+          this.students = response.data;
+          this.getStudents();
+          this.addFiles = false;
+          this.files = [];
+        }, error => {
+          console.log(error);
+        }, {
+          'Content-Type': 'multipart/form-data'
+        });
       } else {
-        console.log("there are no files.");
+        console.log("There are no files.");
       }
-      this.files = []
     },
     // mails
     showMails( ) {
@@ -366,7 +330,7 @@ export default {
     },
     // remove
     removeStudent( id ) {
-      // TODO: send id and command to backend
+      // TODO: send id and command to backend to delete
       var student = this.students.find(s => s.id === id )
       this.students.splice( this.students.indexOf( student ), 1 )
     },

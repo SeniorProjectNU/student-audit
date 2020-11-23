@@ -9,6 +9,9 @@
   },
   "dependencies": {
     "axios": "^0.20.0",
+    "chartist-plugin-axistitle": "0.0.7",
+    "chartist-plugin-legend": "^0.6.2",
+    "chartist-plugin-tooltips": "0.0.17",
     "core-js": "^3.6.5",
     "vee-validate": "^3.4.0",
     "vue": "^2.6.11",

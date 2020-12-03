@@ -305,8 +305,7 @@ export default {
         formData.append('file', this.files[0]);
 
         post(this, '/transcript', formData, response => {
-          this.students = response.data;
-          this.getStudents();
+          this.students.push(response.data);
           this.addFiles = false;
           this.files = [];
         }, error => {

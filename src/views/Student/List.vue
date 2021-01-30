@@ -48,7 +48,7 @@
           <tr class="cursor-pointer" @click="goToAudit(student.id)" v-for="(student) in sortedStudents"
               :key="student.id">
             <td><input @click.stop="" type="checkbox" :value=student.id v-model="selectedStudents"/></td>
-            <td>{{student.studentId}}</td>
+            <td>{{student.id}}</td>
             <td>{{student.name}}</td>
             <td>{{student.gpa}}</td>
             <td>{{student.major}}</td>

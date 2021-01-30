@@ -1,5 +1,5 @@
 import axios from 'axios'
-axios.defaults.baseURL = 'http://178.62.206.207:8080';
+axios.defaults.baseURL = 'https://senior-project-nu.herokuapp.com';
 
 export function post(_this, url, payload, successCallback, errorCallback, headers = '') {
 

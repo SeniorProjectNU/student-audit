@@ -64,22 +64,22 @@
               <tbody>
                 <tr>
                   <td>Cumulative GPA</td>
-                  <td>{{student.gpa}}3.50</td>
+                  <td>{{student.gpa}}</td>
                 </tr>
                 <tr>
                   <td>Credits Enrolled</td>
-                  <td>{{student.creditsEnrolled}}220</td>
+                  <td>{{student.creditsEnrolled}}</td>
                 </tr>
                 <tr>
                   <td>Credits Earned</td>
-                  <td>{{student.creditsEarned}}220</td>
+                  <td>{{student.creditsEarned}}</td>
                 </tr>
               </tbody>
             </v-simple-table>
           </v-card-text>
         </base-material-card>
       </v-col>
-  </v-row>
+    </v-row>
     <v-row>
       <v-col
         cols="6"
@@ -169,7 +169,7 @@
                 <div v-else>
                   <v-icon
                     color="error"
-                    class="mx-1">
+                    class="mx-1">x`
                     mdi-close-circle-outline
                   </v-icon>
                 </div>

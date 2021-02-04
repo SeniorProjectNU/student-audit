@@ -87,7 +87,6 @@
     computed: {
       chartData(){
           let series = [];
-          let set = new Set();
           this.students.forEach(student => {
               let arr1 = [];
               student.studentTerms.forEach(term =>{
@@ -95,7 +94,14 @@
               });
               series.push(arr1);
           });
-          let labels = [...set];
+
+          let l = Math.max(...series.map(el => el.length));
+          for(let i=0; i<l; l++){
+              
+              // for(let j=0; j<series.length; j++){}
+          }
+
+          let labels = [];
           return {
               labels: labels,
               series: series
@@ -106,7 +112,7 @@
       }
     },
     created() {
-      this.getStudents();
+      // this.getStudents();
     }
   }
 </script>

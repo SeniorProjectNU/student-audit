@@ -37,12 +37,13 @@ export function get(_this, url, payload, successCallback, errorCallback) {
 
 
 export function del(_this, url, payload, successCallback, errorCallback) {
-    let headers = _this.$auth.getToken() ? {'Authorization': `Bearer ${_this.$auth.getToken()}`} : '';
+    let headers = '';
 
     return axios({
         method: 'DELETE',
         url: url,
-        headers: headers
+        headers: headers,
+        payload: payload
     }).then(response => {
         successCallback( response );
     }).catch(error => {

@@ -215,7 +215,7 @@
 </template>
 
 <script>
-import { get, post } from '../../helpers/api'
+import { get, post, del } from '../../helpers/api'
 export default {
   data: () => ({
     currentSort: 'Name',
@@ -330,8 +330,8 @@ export default {
     // remove
     removeStudent( id ) {
       // TODO: send id and command to backend to delete
-      var student = this.students.find(s => s.id === id )
-      this.students.splice( this.students.indexOf( student ), 1 )
+      let _this = this;
+      del(_this, '/transcript/'+id, '',  _this.getStudents(),{});
     },
     // router
     goToAudit( id ){

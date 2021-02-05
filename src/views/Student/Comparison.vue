@@ -34,7 +34,7 @@
           </v-col>
       </v-row>
       <v-row>
-          <v-col>
+          <v-col cols="6">
               <chartist type="Line" :data="chartData" :options="chartOptions"></chartist>
           </v-col>
       </v-row>
@@ -79,7 +79,7 @@
     methods: {
       getStudents(){
           let _this = this;
-          get(_this, '/transcript/all', '', response=>{
+          get(_this, '/transcript/students', {params: {id: _this.id} }, response=>{
               _this.students = response.data;
           });
       },

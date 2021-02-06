@@ -332,7 +332,7 @@ export default {
     removeStudent( id ) {
       // TODO: send id and command to backend to delete
       let _this = this;
-      del(_this, '/transcript/'+id, '',  _this.getStudents(),{});
+      del(_this, '/transcript/'+id, '',  () => _this.getStudents(),{});
     },
     // router
     goToAudit( id ){

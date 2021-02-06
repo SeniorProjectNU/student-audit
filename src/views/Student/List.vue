@@ -231,7 +231,8 @@ export default {
     mails: '',
     selectedStudents: [],
     allSelected: false,
-    students: []
+    students: [],
+    imageUrl: ''
   }),
   
   computed: {

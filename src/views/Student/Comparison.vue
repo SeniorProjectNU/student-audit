@@ -79,7 +79,7 @@
     methods: {
       getStudents(){
           let _this = this;
-          get(_this, '/transcript/students', {params: {id: _this.id} }, response=>{
+          get(_this, '/transcript/students/'+_this.id, {}, response=>{
               _this.students = response.data;
           });
       },
@@ -112,7 +112,7 @@
       }
     },
     created() {
-      // this.getStudents();
+      this.getStudents();
     }
   }
 </script>

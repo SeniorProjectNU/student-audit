@@ -1,5 +1,6 @@
 import axios from 'axios'
 axios.defaults.baseURL = 'https://senior-project-nu.herokuapp.com';
+import qs from 'qs'
 
 export function post(_this, url, payload, successCallback, errorCallback, headers = '') {
 
@@ -26,7 +27,10 @@ export function get(_this, url, payload, successCallback, errorCallback) {
         method: 'GET',
         url: url,
         params: payload.params,
-        headers: headers
+        headers: headers,
+        paramsSerializer: params => {
+            return qs.stringify(params, { arrayFormat: "repeat" })
+        },
     }).then(response => {
         successCallback( response );
     }).catch(error => {

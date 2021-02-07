@@ -83,15 +83,15 @@
       .ct-grid
         stroke: rgba(255, 255, 255, 0.2)
 
-      .ct-series-a .ct-point,
-      .ct-series-a .ct-line,
-      .ct-series-a .ct-bar,
-      .ct-series-a .ct-slice-donut
-          stroke: rgba(255,255,255,.8)
+      /*.ct-series-a .ct-point,*/
+      /*.ct-series-a .ct-line,*/
+      /*.ct-series-a .ct-bar,*/
+      /*.ct-series-a .ct-slice-donut*/
+      /*    stroke: rgba(255,255,255,.8)*/
 
-      .ct-series-a .ct-slice-pie,
-      .ct-series-a .ct-area
-          fill: rgba(255,255,255,.4)
+      /*.ct-series-a .ct-slice-pie,*/
+      /*.ct-series-a .ct-area*/
+      /*    fill: rgba(255,255,255,.4)*/
 </style>
 
 <style lang='scss'>

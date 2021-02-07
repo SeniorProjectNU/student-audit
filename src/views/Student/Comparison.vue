@@ -3,7 +3,6 @@
       <v-row>
           <v-col
                   v-for="(student, index) in students" :key="index"
-                  cols="4"
           >
               <base-material-card
                       color="info"
@@ -21,21 +20,30 @@
                           {{student.major}}
                       </div>
                       <div class="text--primary font-weight-light">
-                          {{student.admissionSemester}}
+                          Admission semester: {{student.admissionSemester}}
                       </div>
-                      <div class="text--primary font-weight-light">
-                          {{student.gpa}}
+                      <div class="text--primary">
+                          <span class="font-weight-light">cGPA:</span> {{student.gpa}}
                       </div>
-                      <div class="text--primary font-weight-light">
-                          {{student.creditsEarned}}
+                      <div class="text--primary">
+                          <span class="font-weight-light">Credits earned:</span> {{student.creditsEarned}}
                       </div>
                   </v-card-text>
               </base-material-card>
           </v-col>
       </v-row>
       <v-row>
-          <v-col cols="6">
-              <chartist type="Line" :data="chartData" :options="chartOptions"></chartist>
+          <v-col>
+              <base-material-chart-card
+                      :data="data"
+                      :options="chartOptions"
+                      color="success"
+                      type="Line"
+              >
+                  <h4 class="card-title font-weight-light mt-2 ml-2">
+                      Comparison
+                  </h4>
+              </base-material-chart-card>
           </v-col>
       </v-row>
   </v-container>
@@ -48,29 +56,36 @@
     props: ['id'],
     data () {
       return {
+          data: {
+              labels: ['Fall 2017', 'Spring 2018', 'Fall 2018', 'Spring 2019', 'Fall 2019', 'Spring 2020', 'Fall 2020',
+                  'Spring 2021', 'Fall 2021'],
+              series: [
+                  [3.3, 3.6, null, 3.7, null, 2.8, 2.5, 3.23, 3.6],
+                  [3.2, 3.1, null, 3.5, 2.7, 3.3, 3.1, 3.3, 2.04],
+                  [3.1, 3.3, 2.04, 2.5, 3.6, 3.1, 3.3, 2.04, 2.99]]
+          },
           students: [],
           chartOptions: {
-              high: 4.0,
-              lineSmooth: this.$chartist.Interpolation.simple({
-                fillHoles: true
+              high: 4,
+              low: 0,
+              lineSmooth: this.$chartist.Interpolation.none({
+                fillHoles: false
               }),
               plugins: [
-                this.$chartist.plugins.tooltip(),
-                this.$chartist.plugins.legend({
-                  legendNames: this.names,
-                }),
-                this.$chartist.plugins.ctAxisTitle({
-                  axisY: {
-                    axisTitle: 'GPA',
-                    axisClass: 'ct-axis-title',
-                    offset: {
-                      x: 0,
-                      y: 0
-                    },
-                    textAnchor: 'middle',
-                    flipTitle: false
-                  }
-                })
+                  this.$chartist.plugins.tooltip({ anchorToPoint: true }),
+                  this.$chartist.plugins.ctAxisTitle({
+                      axisY: {
+                          axisTitle: 'GPA',
+                          axisClass: 'gpa-axis-title',
+                          textAnchor: 'middle',
+                          offset: {
+                              x: 0,
+                              y: 20
+                          },
+                          flipTitle: true
+                      }
+                  }),
+                  // this.$chartist.plugins.legend({legendNames: ["Hey", "Pay"]})
               ]
             }
           }
@@ -86,33 +101,40 @@
     },
     computed: {
       chartData(){
-          let series = [];
-          this.students.forEach(student => {
-              let arr1 = [];
-              student.studentTerms.forEach(term =>{
-                  arr1.push({x: term.name, y: term.termGpa});
-              });
-              series.push(arr1);
-          });
-
-          let l = Math.max(...series.map(el => el.length));
-          for(let i=0; i<l; l++){
-              
-              // for(let j=0; j<series.length; j++){}
-          }
-
-          let labels = [];
           return {
-              labels: labels,
-              series: series
+              labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+              series: [
+              [12, 9, 7, 8, 5],
+              [2, 1, 3.5, 7, 3],
+              [1, 3, 4, 5, 6]
+          ]
           }
       },
-      names(){
-        return this.students.map(x=>x.name)
-      }
     },
     created() {
       this.getStudents();
     }
   }
 </script>
+
+<style>
+    .chartist-tooltip
+    {
+        background: #999999;
+    }
+
+    .chartist-tooltip:before
+    {
+        border-top-color: #999999;
+    }
+
+    .ct-point
+    {
+        stroke-width: 8px !important;
+    }
+
+    .gpa-axis-title
+    {
+        fill: #c6e6c7;
+    }
+</style>

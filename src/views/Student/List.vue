@@ -19,6 +19,18 @@
     <v-spacer/>
     <v-col cols="6" md="2">
         <v-btn
+          v-if="selectedStudents.length > 0"
+          color="success"
+          @click="del=true">
+          Delete
+          <v-icon
+            class="mx-1">
+            mdi-delete
+          </v-icon>
+        </v-btn>
+    </v-col>
+    <v-col cols="6" md="2">
+        <v-btn
           color="success"
           @click="addFiles=true">
           Add transcript
@@ -57,7 +69,7 @@
               <v-tooltip open-delay="83" bottom>
                 <template v-slot:activator="{ on, attrs }">
                   <v-icon
-                    @click.stop="removeStudent(student.id)"
+                    @click.stop="selectedStudents=[student.id], del=true"
                     v-bind="attrs"
                     v-on="on"
                     color="error"
@@ -130,23 +142,15 @@
             outlined
             accept=".pdf"
           >
-          <template v-slot:selection="{ index, text }">
-            <v-chip
-              v-if="index < 2"
-              dark
-              label
-              small
-            >
-              {{ text }}
-            </v-chip>
-
-            <span
-              v-else-if="index === 2"
-            >
-              +{{ files.length - 2 }} File(s)
-            </span>
-          </template>
           </v-file-input>
+          <v-simple-table>
+            <tbody>
+              <tr v-for="(file,f) in files" :key="f">
+                <td>{{file.name}}</td>
+                <td>{{file.success===1 ? "uploaded" : "waiting"}}</td>
+              </tr>
+            </tbody>
+          </v-simple-table>
         </v-card-text>
 
         <v-divider></v-divider>
@@ -211,6 +215,48 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog
+      v-model="del"
+      max-width="600"
+    >
+      <v-card>
+        <v-card-title class="warning--text display-2">
+          Warning!
+
+          <v-spacer />
+
+          <v-icon
+            aria-label="Close"
+            @click="del = false"
+          >
+            mdi-close
+          </v-icon>
+        </v-card-title>
+
+        <v-card-text class="text-center">
+          Are you sure you want to delete?
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="warning"
+            text
+            @click="del = false, selectedStudents = []"
+          >
+            Cancel
+          </v-btn>
+
+          <v-btn
+            color="warning"
+            text
+            @click="removeStudents(selectedStudents)"
+          >
+            Yes
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -232,7 +278,7 @@ export default {
     selectedStudents: [],
     allSelected: false,
     students: [],
-    imageUrl: ''
+    del: ''
   }),
   
   computed: {
@@ -296,24 +342,26 @@ export default {
       } else {
         this.allSelected = false
       }
-      console.log(this.sortedStudents);
     },
     // transcript addition
     submitFiles() {
       if ( this.files.length != 0 ) {
-        let formData = new FormData();
-        // TODO: change for multiple files
-        formData.append('file', this.files[0]);
+        for(var i = 0; i < this.files.length; i ++ ) {
+          let formData = new FormData();
+          formData.append('file', this.files[i]);
 
-        post(this, '/transcript', formData, response => {
-          this.students.push(response.data);
-          this.addFiles = false;
-          this.files = [];
-        }, error => {
-          console.log(error);
-        }, {
-          'Content-Type': 'multipart/form-data'
-        });
+          post(this, '/transcript', formData, response => {
+            this.students.push(response.data);
+            this.files[i].success = 1;
+          }, error => {
+            console.log(error);
+            this.files[i].success = 0;
+          }, {
+            'Content-Type': 'multipart/form-data'
+          });
+        }
+        this.addFiles = false;
+        this.files = [];
       } else {
         console.log("There are no files.");
       }
@@ -329,10 +377,11 @@ export default {
       navigator.clipboard.writeText(this.mails);
     },
     // remove
-    removeStudent( id ) {
-      // TODO: send id and command to backend to delete
-      let _this = this;
-      del(_this, '/transcript/'+id, '',  () => _this.getStudents(),{});
+    removeStudents( ids ) {
+      for(var i = 0; i < ids.length; i ++) {
+        del(this, '/transcript/'+ids[i], '',  () => this.getStudents(),{});
+      }
+      this.del = false;
     },
     // router
     goToAudit( id ){

@@ -22,7 +22,6 @@
       <v-col
         cols="12"
         sm="6"
-        lg="3"
       >
         <base-material-card
           color="info"
@@ -35,7 +34,7 @@
             </div>
 
             <div class="subtitle-1 font-weight-light">
-              {{student.studentId}}
+              {{student.id}}
             </div>
             
             <div class="text--primary font-weight-light">
@@ -51,7 +50,6 @@
       <v-col
         cols="12"
         sm="6"
-        lg="3"
       >
         <base-material-card
           color="info"
@@ -83,7 +81,6 @@
     <v-row>
       <v-col
         cols="6"
-        lg="4"
       >
         <base-material-chart-card
           :data="courseGPAchart.data"
@@ -108,7 +105,6 @@
 
       <v-col
         cols="6"
-        lg="4"
       >
         <base-material-chart-card
           :data="semesterGPAchart.data"
@@ -128,16 +124,33 @@
         </base-material-chart-card>
       </v-col>
     </v-row>
-  <base-material-card
+    <v-row>
+      <v-select v-model="selectedCurriculum"
+        :items ="curriculums"
+        item-text = "major"
+        item-value= "id"
+        prepend-icon="mdi-format-align-justify"
+        menu-props="auto"
+        hide-details
+        label="Select a curriculum to build a report"
+        single-line
+      >
+      </v-select>
+      <v-btn
+          color="success"
+          @click="buildReport()">
+        Create
+      </v-btn>
+    </v-row>
+    <base-material-card
       icon="mdi-format-list-checks"
       title="Audit"
       class="px-5 py-3"
     >
-      <v-simple-table
-        height=300
-        fixed-header>
+      <v-simple-table>
         <thead>
           <tr>
+            <th></th>
             <th class="primary--text display-1">Required Course</th>
             <th class="primary--text display-1">Credits</th>
             <th class="primary--text display-1">Taken</th>
@@ -147,51 +160,106 @@
         </thead>
 
         <tbody>
-          <tr v-for="course in tableInfo"
+          <tr v-for="course in tableInfo.completeRequirements"
               :key="course.id">
+              <td><input type="checkbox" :value=course.id v-model="map2unmap"/></td>
               <td>
-                {{course.req.name}}
+                {{course.requirement.name}}
               </td>
               <td>
-                {{course.req.credits}}
+                {{course.requirement.credit}}
               </td>
               <td>
-                <div v-if="course.taken.name === course.req.name">
+                <div v-if="course.course.code === course.requirement.patterns">
                   <v-icon
                     color="success"
                     class="mx-1">
                     mdi-checkbox-marked-circle-outline
                   </v-icon>
                 </div>
-                <div v-else-if="course.taken.name">
-                  {{course.taken.name}}
+                <div v-else-if="course.course.code">
+                  {{course.course.code}}
                 </div>
                 <div v-else>
                   <v-icon
                     color="error"
-                    class="mx-1">x`
+                    class="mx-1">
                     mdi-close-circle-outline
                   </v-icon>
                 </div>
               </td>
               <td>
-                {{course.taken.credits}}
+                {{course.course.credits}}
               </td>
               <td>
-                <div v-for="(grade, index) in course.taken.grades"
-                  :key="index">
-                  {{grade}} 
-                </div>
+                {{course.course.gradePoint}}
               </td>
+          </tr>
+          <tr v-for="course in tableInfo.unmappedCourses"
+              :key="course.id">
+              <td><input type="checkbox" :value=course.id v-model="unmappedCourse"/></td>
+              <td>
+                Unmapped course
+              </td>
+              <td></td>
+              <td>
+                {{course.code}}
+              </td>
+              <td>
+                {{course.credits}}
+              </td>
+              <td>
+                {{course.gradePoint}}
+              </td>
+          </tr>
+          <tr v-for="req in tableInfo.unmappedRequirements"
+              :key="req.id">
+              <td><input type="checkbox" :value=req.id v-model="unmappedReq"/></td>
+              <td>
+                {{req.name}}
+              </td>
+              <td>
+                {{req.credit}}
+              </td>
+              <td>
+                Unmapped requirement
+              </td>
+              <td></td>
+              <td></td>
           </tr>
         </tbody>
       </v-simple-table>
     </base-material-card>
+    <v-row class="text-right">
+      <v-spacer></v-spacer>
+      <v-col cols="3" md="2">
+          <v-btn
+            color="error"
+            @click="mapUnmap()"
+          >
+            Map/Unmap
+            <v-icon>
+              mdi-link
+            </v-icon>
+          </v-btn>
+      </v-col>
+      <v-col cols="3" md="2">
+          <v-btn
+            color="error"
+            @click="removeAudit()"
+          >
+            Clear
+            <v-icon>
+              mdi-delete
+            </v-icon>
+          </v-btn>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script>
-  import { get } from '../../helpers/api'
+  import { get, post, del } from '../../helpers/api'
 
   export default {
     name: 'StudentAudit',
@@ -205,10 +273,20 @@
         semesterGPAchart: {},
         courseGPAchart: {},
         tableInfo: [],
+        curriculums: [],
+        selectedCurriculum: "",
+        map2unmap: [],
+        unmappedCourse: [],
+        unmappedReq: []
       }
     },
     
     methods: {
+      getCurriculums() {
+        get(this, '/curriculum', '', response=>{
+          this.curriculums = response.data;
+        })
+      },
       getInfo() {
         get(this, '/transcript/student/' + this.$route.params.id, '', response=>{
           this.student = response.data;
@@ -276,425 +354,45 @@
       },
       // TODO
       getReport() {
-        this.taken = 34
-        this.earned = 20
-        this.tableInfo = [
-          {
-            req: {
-              name: "CSCI 151 - Programming for Scientists and Engineers",
-              credits: 8,
-            },
-            taken: {
-              name: "CSCI 151 - Programming for Scientists and Engineers",
-              credits: 8,
-              grades: [ "A" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 152 - Performance and Data Structures",
-              credits: 8,
-            },
-            taken: {
-              name: "CSCI 152 - Performance and Data Structures",
-              credits: 8,
-              grades: [ "B" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 231 - Computer Systems and Organization",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 231 - Computer Systems and Organization",
-              credits: 6,
-              grades: [ "B" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 235 - Programming Languages",
-              credits: 8,
-            },
-            taken: {
-              name: "CSCI 235 - Programming Languages",
-              credits: 8,
-              grades: [ "B-" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 270 - Algorithms",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 270 - Algorithms",
-              credits: 6,
-              grades: [ "B+" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 272 - Formal Languages",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 272 - Formal Languages",
-              credits: 6,
-              grades: [ "B-" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 390 - Artificial Intelligence",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 390 - Artificial Intelligence",
-              credits: 6,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 341 - Database Systems",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 341 - Database Systems",
-              credits: 6,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 361 - Software Engineering",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 361 - Software Engineering",
-              credits: 6,
-              grades: [ "B" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 333 - Computer Networks",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 333 - Computer Networks",
-              credits: 6,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 332 - Operating Systems",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 332 - Operating Systems",
-              credits: 6,
-              grades: [ "A" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 307 - Research Methods",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 307 - Research Methods",
-              credits: 6,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI 408 - Senior Project I",
-              credits: 6,
-            },
-            taken: {}
-          },
-          {
-            req: {
-              name: "CSCI 409 - Senior Project II",
-              credits: 6,
-            },
-            taken: {}
-          },
-          {
-            req: {
-              name: "ROBT 206 - Microcontrollers with Lab",
-              credits: 8,
-            },
-            taken: {
-              name: "ROBT 206 - Microcontrollers with Lab",
-              credits: 8,
-              grades: [ "B+" ]
-            }
-          },
-          {
-            req: {
-              name: "MATH 161 - Calculus I",
-              credits: 8,
-            },
-            taken: {
-              name: "MATH 161 - Calculus I",
-              credits: 8,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "MATH 162 - Calculus II",
-              credits: 8,
-            },
-            taken: {
-              name: "MATH 162 - Calculus II",
-              credits: 8,
-              grades: [ "A" ]
-            }
-          },
-          {
-            req: {
-              name: "MATH 251 - Discrete Mathematics",
-              credits: 6,
-            },
-            taken: {
-              name: "MATH 251 - Discrete Mathematics",
-              credits: 6,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "MATH 273 - Linear Algebra with Applications",
-              credits: 8,
-            },
-            taken: {
-              name: "MATH 273 - Linear Algebra with Applications",
-              credits: 8,
-              grades: [ "B-" ]
-            }
-          },
-          {
-            req: {
-              name: "MATH 321 - Probability",
-              credits: 6,
-            },
-            taken: {
-              name: "MATH 321 - Probability",
-              credits: 6,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI elective",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 245 - System Analysis and Design",
-              credits: 6,
-              grades: [ "A" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI elective",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 447 - Machine Learning: Theory and Practice",
-              credits: 6,
-              grades: [ "B+" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI elective",
-              credits: 6,
-            },
-            taken: {
-              name: "CSCI 399 - Internship II",
-              credits: 6,
-              grades: [ "P" ]
-            }
-          },
-          {
-            req: {
-              name: "CSCI elective",
-              credits: 6,
-            },
-            taken: {}
-          },
-          {
-            req: {
-              name: "PHYS 161 - Physics I for Scientists and Engineers with Laboratory",
-              credits: 8,
-            },
-            taken: {
-              name: "PHYS 161 - Physics I for Scientists and Engineers with Laboratory",
-              credits: 8,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "PHYS 162 - Physics II for Scientists and Engineers with Laboratory",
-              credits: 8,
-            },
-            taken: {
-              name: "PHYS 162 - Physics II for Scientists and Engineers with Laboratory",
-              credits: 8,
-              grades: [ "A" ]
-            }
-          },
-          {
-            req: {
-              name: "Natural Science elective",
-              credits: 6,
-            },
-            taken: {
-              name: "BIOL 110 - Modern Biology I with Lab",
-              credits: 8,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "Natural Science elective",
-              credits: 6,
-            },
-            taken: {
-              name: "CHEM 101 - General Chemistry I",
-              credits: 6,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "HST 100 - History of Kazakhstan",
-              credits: 6,
-            },
-            taken: {
-              name: "HST 100 - History of Kazakhstan",
-              credits: 6,
-              grades: [ "B" ]
-            }
-          },
-          {
-            req: {
-              name: "Kazakh",
-              credits: 6,
-            },
-            taken: {
-              name: "KAZ 101 - Basic Kazakh I",
-              credits: 6,
-              grades: [ "A" ]
-            }
-          },
-          {
-            req: {
-              name: "Kazakh",
-              credits: 6,
-            },
-            taken: {}
-          },
-          {
-            req: {
-              name: "Social Science and Humanities elective",
-              credits: 6,
-            },
-            taken: {
-              name: "ECON 101 - Introduction to Microeconomics",
-              credits: 6,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "Social Science and Humanities elective",
-              credits: 6,
-            },
-            taken: {
-              name: "PHIL 141 - Critical Thinking",
-              credits: 6,
-              grades: [ "A-" ]
-            }
-          },
-          {
-            req: {
-              name: "Social Science and Humanities elective",
-              credits: 6,
-            },
-            taken: {}
-          },
-          {
-            req: {
-              name: "Social Science and Humanities elective",
-              credits: 6,
-            },
-            taken: {}
-          },
-          {
-            req: {
-              name: "Free elective",
-              credits: 6,
-            },
-            taken: {
-              name: "CHEM 102 - General Chemistry II",
-              credits: 6,
-              grades: [ "B+" ]
-            }
-          },
-          {
-            req: {
-              name: "Free elective",
-              credits: 6,
-            },
-            taken: {
-              name: "BIOL 120 - Modern Biology II with Lab",
-              credits: 8,
-              grades: [ "A" ]
-            }
-          },
-          {
-            req: {
-              name: "Extra",
-            },
-            taken: {
-              name: "MATH 263 - Calculus III",
-              credits: 8,
-              grades: [ "B" ]
-            }
-          },
-          {
-            req: {
-              name: "Extra"
-            },
-            taken: {
-              name: "CHEM 101L - General Chemistry I lab",
-              credits: 2,
-              grades: [ "A" ]
-            }
-          },
-          {
-            req: {
-              name: "Extra",
-            },
-            taken: {
-              name: "CHEM 102L - General Chemistry II lab",
-              credits: 2,
-              grades: [ "A" ]
-            }
-          },
-        ]
+        get(this, '/report/'+ this.$route.params.id, '', response => {
+          this.tableInfo = response.data;
+        });
       },
+      buildReport( ) {
+        let data = {
+          curriculumId: this.selectedCurriculum,
+          studentId: this.student.id
+        }
 
+        post(this, '/report', data, response => {
+          this.tableInfo = response.data;
+        }, error => {
+          console.log(error);
+        });
+      },
+      mapUnmap( ) {
+        if(this.map2unmap.length === 0) {
+          if(this.unmappedCourse.length === 1 && this.unmappedReq.length === 1) {
+            let data = {
+              courseId: this.unmappedCourse[0],
+              reportId: this.student.id,
+              requirementId: this.unmappedReq[0]
+            }
+            console.log(data)
+
+            post(this, '/report/' + this.studentId + '/mapRequirement', data, response => {
+              this.getReport();
+              this.unmappedReq = [];
+              this.unmappedCourse = [];
+              console.log(response);
+            }, error => {
+              console.log(error);
+            });
+          } else {
+            console.log("There should be only one course and requirement to map");
+          }
+        }
+      },
       downloadAudit( ) {
         // TODO: try
         /*
@@ -712,10 +410,14 @@
           link.click();
         }); */
       },
+      removeAudit() {
+        del(this, '/report/'+this.student.id, '',  () => this.getReport(),{});
+      }
     },
 
     created() {
       this.getInfo()
+      this.getCurriculums()
       this.getCourseChart()
       this.getSemesterChart()
       this.getReport()

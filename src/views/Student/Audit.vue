@@ -162,7 +162,7 @@
         <tbody>
           <tr v-for="course in tableInfo.completeRequirements"
               :key="course.id">
-              <td><input type="checkbox" :value=course.id v-model="map2unmap"/></td>
+              <td><input type="checkbox" :value=course.requirement.id v-model="map2unmap"/></td>
               <td>
                 {{course.requirement.name}}
               </td>
@@ -373,23 +373,27 @@
       mapUnmap( ) {
         if(this.map2unmap.length === 0) {
           if(this.unmappedCourse.length === 1 && this.unmappedReq.length === 1) {
-            let data = {
-              courseId: this.unmappedCourse[0],
-              reportId: this.student.id,
-              requirementId: this.unmappedReq[0]
-            }
-            console.log(data)
-
-            post(this, '/report/' + this.studentId + '/mapRequirement', data, response => {
+            let query = 'requirementId='+this.unmappedReq[0]+'&courseId='+this.unmappedCourse[0];
+            post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '', () => {
               this.getReport();
               this.unmappedReq = [];
               this.unmappedCourse = [];
-              console.log(response);
             }, error => {
               console.log(error);
             });
           } else {
             console.log("There should be only one course and requirement to map");
+          }
+        } else {
+          if(this.map2unmap.length > 0) {
+            for(var i = 0; i < this.map2unmap.length; i++) {
+              post(this, '/report/' + this.student.id + '/detachRequirement?requirementId='+this.map2unmap[i], '', () => {
+                this.getReport();
+              }, error => {
+                console.log(error);
+              });
+            }
+            this.map2unmap = []
           }
         }
       },

@@ -143,14 +143,14 @@
       </v-btn>
     </v-row>
     <base-material-card
-      icon="mdi-format-list-checks"
+      icon="mdi-text-box-check"
       title="Audit"
       class="px-5 py-3"
     >
       <v-simple-table>
         <thead>
           <tr>
-            <th></th>
+            <th><input class="mr-3" type="checkbox" @click="selectAll" v-model="allSelected"/></th>
             <th class="primary--text display-1">Required Course</th>
             <th class="primary--text display-1">Credits</th>
             <th class="primary--text display-1">Taken</th>
@@ -180,13 +180,6 @@
                 <div v-else-if="course.course.code">
                   {{course.course.code}}
                 </div>
-                <div v-else>
-                  <v-icon
-                    color="error"
-                    class="mx-1">
-                    mdi-close-circle-outline
-                  </v-icon>
-                </div>
               </td>
               <td>
                 {{course.course.credits}}
@@ -195,47 +188,87 @@
                 {{course.course.gradePoint}}
               </td>
           </tr>
-          <tr v-for="course in tableInfo.unmappedCourses"
-              :key="course.id">
-              <td><input type="checkbox" :value=course.id v-model="unmappedCourse"/></td>
-              <td>
-                Unmapped course
-              </td>
-              <td></td>
-              <td>
-                {{course.code}}
-              </td>
-              <td>
-                {{course.credits}}
-              </td>
-              <td>
-                {{course.gradePoint}}
-              </td>
-          </tr>
-          <tr v-for="req in tableInfo.unmappedRequirements"
-              :key="req.id">
-              <td><input type="checkbox" :value=req.id v-model="unmappedReq"/></td>
-              <td>
-                {{req.name}}
-              </td>
-              <td>
-                {{req.credit}}
-              </td>
-              <td>
-                Unmapped requirement
-              </td>
-              <td></td>
-              <td></td>
-          </tr>
         </tbody>
       </v-simple-table>
     </base-material-card>
+    <v-row>
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <base-material-card
+          icon="mdi-text-box-remove"
+          title="Unmapped requirements"
+          class="px-5 py-3"
+        >
+          <v-simple-table>
+            <thead>
+              <tr>
+                <th></th>
+                <th class="primary--text display-1">Required Course</th>
+                <th class="primary--text display-1">Credits</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-for="req in tableInfo.unmappedRequirements"
+                  :key="req.id">
+                  <td><input type="radio" :value=req.id v-model="unmappedReq"/></td>
+                  <td>
+                    {{req.name}}
+                  </td>
+                  <td>
+                    {{req.credit}}
+                  </td>
+              </tr>
+            </tbody>
+          </v-simple-table>
+        </base-material-card>
+      </v-col>
+      <v-col
+        cols="12"
+        md="6"
+      >
+        <base-material-card
+          icon="mdi-text-box-plus"
+          title="Unmapped courses"
+          class="px-5 py-3"
+        >
+          <v-simple-table>
+            <thead>
+              <tr>
+                <th></th>
+                <th class="primary--text display-1">Taken Course</th>
+                <th class="primary--text display-1">Credits</th>
+                <th class="primary--text display-1">Grades</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr v-for="course in tableInfo.unmappedCourses"
+                  :key="course.id">
+                  <td><input type="radio" :value=course.id v-model="unmappedCourse"/></td>
+                  <td>
+                    {{course.code}}
+                  </td>
+                  <td>
+                    {{course.credits}}
+                  </td>
+                  <td>
+                    {{course.gradePoint}}
+                  </td>
+              </tr>
+            </tbody>
+          </v-simple-table>
+        </base-material-card>
+      </v-col>
+    </v-row>
     <v-row class="text-right">
       <v-spacer></v-spacer>
       <v-col cols="3" md="2">
           <v-btn
             color="error"
-            @click="mapUnmap()"
+            @click="dialog = true"
           >
             Map/Unmap
             <v-icon>
@@ -246,7 +279,7 @@
       <v-col cols="3" md="2">
           <v-btn
             color="error"
-            @click="removeAudit()"
+            @click="del=true, dialog = true"
           >
             Clear
             <v-icon>
@@ -255,6 +288,48 @@
           </v-btn>
       </v-col>
     </v-row>
+    <v-dialog
+      v-model="dialog"
+      max-width="600"
+    >
+      <v-card>
+        <v-card-title class="warning--text display-2">
+          Warning!
+
+          <v-spacer />
+
+          <v-icon
+            aria-label="Close"
+            @click="dialog = false, del = false"
+          >
+            mdi-close
+          </v-icon>
+        </v-card-title>
+
+        <v-card-text class="text-center">
+          {{del ? 'Are you sure you want to delete?' : (map2unmap.length > 0 ? 'Are you sure you want to unmap the selected rows?' : ( unmappedReq !== '' ? 'Are you sure you want to map the selected course to the selected requirement?' : 'Nothing selected!'))}}
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="warning"
+            text
+            @click="dialog = false, del = false, map2unmap = [], unmappedCourse = '', unmappedReq = ''"
+          >
+            Cancel
+          </v-btn>
+
+          <v-btn
+            color="warning"
+            text
+            @click="del === true ? removeAudit() : mapUnmap(), dialog=false, del=false"
+          >
+            Yes
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -276,8 +351,17 @@
         curriculums: [],
         selectedCurriculum: "",
         map2unmap: [],
-        unmappedCourse: [],
-        unmappedReq: []
+        allSelected: false,
+        unmappedCourse: '',
+        unmappedReq: '',
+        dialog: false,
+        del: false
+      }
+    },
+
+    watch: {
+      map2unmap(val) {
+        this.allSelected = val.length === this.tableInfo.completeRequirements.length;
       }
     },
     
@@ -292,7 +376,6 @@
           this.student = response.data;
         })
       },
-
       getSemesterChart() {
         this.semesterGPAchart = {
           data: {
@@ -352,7 +435,6 @@
           ],
         }
       },
-      // TODO
       getReport() {
         get(this, '/report/'+ this.$route.params.id, '', response => {
           this.tableInfo = response.data;
@@ -370,52 +452,37 @@
           console.log(error);
         });
       },
+      selectAll( ) {
+        this.map2unmap = []
+        if( !this.allSelected ) {
+          this.allSelected = true
+          this.tableInfo.completeRequirements.forEach(x => this.map2unmap.push(x.requirement.id))
+        } else {
+          this.allSelected = false
+        }
+      },
       mapUnmap( ) {
         if(this.map2unmap.length === 0) {
-          if(this.unmappedCourse.length === 1 && this.unmappedReq.length === 1) {
-            let query = 'requirementId='+this.unmappedReq[0]+'&courseId='+this.unmappedCourse[0];
-            post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '', () => {
-              this.getReport();
-              this.unmappedReq = [];
-              this.unmappedCourse = [];
-            }, error => {
-              console.log(error);
-            });
-          } else {
-            console.log("There should be only one course and requirement to map");
-          }
+          let query = 'requirementId='+this.unmappedReq+'&courseId='+this.unmappedCourse;
+          this.unmappedReq = '';
+          this.unmappedCourse = '';
+          post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '', () => this.getReport(), {});
         } else {
-          if(this.map2unmap.length > 0) {
-            for(var i = 0; i < this.map2unmap.length; i++) {
-              post(this, '/report/' + this.student.id + '/detachRequirement?requirementId='+this.map2unmap[i], '', () => {
-                this.getReport();
-              }, error => {
-                console.log(error);
-              });
-            }
-            this.map2unmap = []
+          for(var i = 0; i < this.map2unmap.length; i++) {
+            post(this, '/report/' + this.student.id + '/detachRequirement?requirementId='+this.map2unmap[i], '', () => {
+              this.getReport();
+            }, {});
           }
+          this.map2unmap = []
         }
       },
       downloadAudit( ) {
-        // TODO: try
-        /*
-        axios({
-          url: '',
-          method: 'GET',
-          responseType: 'blob', // important
-          headers: { 'Accept': 'application/vnd.ms-excel' }
-        }).then((response) => {
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const link = document.createElement('a');
-          link.href = url;
-          link.setAttribute('download', 'file.pdf');
-          document.body.appendChild(link);
-          link.click();
-        }); */
+        window.print()
       },
       removeAudit() {
-        del(this, '/report/'+this.student.id, '',  () => this.getReport(),{});
+        del(this, '/report/'+this.student.id, '',  () => { 
+          this.getReport();
+        }, {});
       }
     },
 

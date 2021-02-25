@@ -379,9 +379,10 @@ export default {
     // remove
     removeStudents( ids ) {
       for(var i = 0; i < ids.length; i ++) {
-        del(this, '/transcript/'+ids[i], '',  () => this.getStudents(),{});
+        del(this, '/transcript/'+ids[i], '',  {}, {});
       }
       this.del = false;
+      this.getStudents();
     },
     // router
     goToAudit( id ){

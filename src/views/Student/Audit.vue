@@ -221,8 +221,8 @@
             <tbody>
               <tr v-for="req in tableInfo.unmappedRequirements"
                   :key="req.id"
-                  @click.stop="unmappedReq=req.id">
-                  <td><input type="radio" :value=req.id v-model="unmappedReq"/></td>
+                  @click.stop="unmappedReq=req">
+                  <td><input type="radio" :value=req v-model="unmappedReq"/></td>
                   <td>
                     {{req.name}}
                   </td>
@@ -257,8 +257,8 @@
             <tbody>
               <tr v-for="course in tableInfo.unmappedCourses"
                   :key="course.id"
-                  @click.stop="unmappedCourse=course.id">
-                  <td><input type="radio" :value=course.id v-model="unmappedCourse"/></td>
+                  @click.stop="unmappedCourse=course">
+                  <td><input type="radio" :value=course v-model="unmappedCourse"/></td>
                   <td>
                     {{course.code}}
                   </td>
@@ -278,7 +278,7 @@
       <v-spacer></v-spacer>
       <v-col cols="3" md="2">
           <v-btn
-            v-if="map2unmap.length > 0 || (unmappedCourse && unmappedReq)"
+            v-if="map2unmap.length > 0 || (unmappedCourse !== '' && unmappedReq !== '')"
             color="error"
             @click="dialog = true"
           >
@@ -320,7 +320,7 @@
         </v-card-title>
 
         <v-card-text class="text-center">
-          {{del ? 'Are you sure you want to delete?' : (map2unmap.length > 0 ? 'Are you sure you want to unmap the selected rows?' : ( unmappedReq !== '' ? 'Are you sure you want to map the selected course to the selected requirement?' : 'Nothing selected!'))}}
+          {{del ? 'Are you sure you want to delete?' : (map2unmap.length > 0 ? 'Are you sure you want to unmap the selected row(s)?' : ( unmappedReq.credit > unmappedCourse.credits ? 'Credits do not match' : (unmappedReq !== '' && unmappedCourse !== '' ? 'Are you sure you want to map the selected course to the selected requirement?' : 'Nothing selected or incorrect selection!')))}}
         </v-card-text>
 
         <v-card-actions>
@@ -476,15 +476,17 @@
       },
       mapUnmap( ) {
         if(this.map2unmap.length === 0) {
-          let query = 'requirementId='+this.unmappedReq+'&courseId='+this.unmappedCourse;
-          this.unmappedReq = '';
-          this.unmappedCourse = '';
-          post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '', () => this.getReport(), {});
+          if(this.unmappedReq.credit <= this.unmappedCourse.credits) {
+            let query = 'requirementId='+this.unmappedReq.id+'&courseId='+this.unmappedCourse.id;
+            post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '', () => this.getReport(), {});
+          }
         } else {
           this.map2unmap.forEach(x => post(this, '/report/' + this.student.id + '/detachRequirement?requirementId='+x,
             '', () => this.getReport(), {}));
-          this.map2unmap = []
         }
+        this.unmappedReq = '';
+        this.unmappedCourse = '';
+        this.map2unmap = []
       },
       allRowCheckbox(map2unmap, id) {
         if(map2unmap.includes(id)) {

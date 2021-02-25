@@ -108,7 +108,7 @@
 </template>
 
 <script>
-    import { get } from '../../helpers/api'
+    import { get, del } from '../../helpers/api'
 
     import DeleteModal from '../common/modal/DeleteModal.vue'
 
@@ -141,9 +141,8 @@
           this.$refs.delete.showModal();
         },
         deleteCurriculum(val){
-          if (val)
-            console.log("request delete");
-          this.$refs.delete.closeModal()
+          let _this = this;
+          del(_this, '/curriculum/'+val, '',  () => {_this.getCurriculums(); _this.$refs.delete.closeModal();},{});
         },
         selectAll() {
           this.selectedCurriculums = [];

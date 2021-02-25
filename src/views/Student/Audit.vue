@@ -79,7 +79,7 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col
+      <!-- v-col
         cols="6"
       >
         <base-material-chart-card
@@ -101,10 +101,10 @@
             
           </p>
         </base-material-chart-card>
-      </v-col>
+      </v-col -->
 
       <v-col
-        cols="6"
+        cols="12"
       >
         <base-material-chart-card
           :data="semesterGPAchart.data"
@@ -161,7 +161,8 @@
 
         <tbody>
           <tr v-for="course in tableInfo.completeRequirements"
-              :key="course.id">
+              :key="course.id"
+              @click.stop="allRowChecbox(map2unmap, course.requirement.id)">
               <td><input type="checkbox" :value=course.requirement.id v-model="map2unmap"/></td>
               <td>
                 {{course.requirement.name}}
@@ -212,7 +213,8 @@
 
             <tbody>
               <tr v-for="req in tableInfo.unmappedRequirements"
-                  :key="req.id">
+                  :key="req.id"
+                  @click.stop="unmappedReq=req.id">
                   <td><input type="radio" :value=req.id v-model="unmappedReq"/></td>
                   <td>
                     {{req.name}}
@@ -246,7 +248,8 @@
 
             <tbody>
               <tr v-for="course in tableInfo.unmappedCourses"
-                  :key="course.id">
+                  :key="course.id"
+                  @click.stop="unmappedCourse=course.id">
                   <td><input type="radio" :value=course.id v-model="unmappedCourse"/></td>
                   <td>
                     {{course.code}}
@@ -476,11 +479,18 @@
           this.map2unmap = []
         }
       },
+      allRowChecbox(map2unmap, id) {
+        if(map2unmap.includes(id)) {
+          map2unmap = map2unmap.splice(map2unmap.indexOf(id),1);
+        } else {
+          map2unmap.push(id);
+        }
+      },
       downloadAudit( ) {
         window.print()
       },
       removeAudit() {
-        del(this, '/report/'+this.student.id, '',  () => { 
+        del(this, '/report/'+this.$route.params.id, '',  () => { 
           this.getReport();
         }, {});
       }

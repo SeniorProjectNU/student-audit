@@ -102,7 +102,7 @@
         <DeleteModal
                 disabled ref="delete"
                 :number="selectedToDelete.length"
-                @submit="deleteCurriculum">
+                @submit="deleteCurriculum(selectedToDelete)">
         </DeleteModal>
     </v-container>
 </template>
@@ -142,7 +142,9 @@
         },
         deleteCurriculum(val){
           let _this = this;
-          del(_this, '/curriculum/'+val, '',  () => {_this.getCurriculums(); _this.$refs.delete.closeModal();},{});
+          for(var i = 0; i < val.length; i ++) {
+            del(_this, '/curriculum/'+val[i], '',  {});
+          }
         },
         selectAll() {
           this.selectedCurriculums = [];

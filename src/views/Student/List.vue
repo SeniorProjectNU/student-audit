@@ -143,14 +143,6 @@
             accept=".pdf"
           >
           </v-file-input>
-          <v-simple-table>
-            <tbody>
-              <tr v-for="(file,f) in files" :key="f">
-                <td>{{file.name}}</td>
-                <td>{{file.success===1 ? "uploaded" : "waiting"}}</td>
-              </tr>
-            </tbody>
-          </v-simple-table>
         </v-card-text>
 
         <v-divider></v-divider>
@@ -350,13 +342,7 @@ export default {
           let formData = new FormData();
           formData.append('file', this.files[i]);
 
-          post(this, '/transcript', formData, response => {
-            this.students.push(response.data);
-            this.files[i].success = 1;
-          }, error => {
-            console.log(error);
-            this.files[i].success = 0;
-          }, {
+          post(this, '/transcript', formData, () => this.getStudents(), {}, {
             'Content-Type': 'multipart/form-data'
           });
         }
@@ -379,10 +365,9 @@ export default {
     // remove
     removeStudents( ids ) {
       for(var i = 0; i < ids.length; i ++) {
-        del(this, '/transcript/'+ids[i], '',  {}, {});
+        del(this, '/transcript/'+ids[i], '',  () => this.getStudents(), {});
       }
       this.del = false;
-      this.getStudents();
     },
     // router
     goToAudit( id ){

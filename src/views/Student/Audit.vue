@@ -127,7 +127,6 @@
     <v-row>
       <v-select v-model="selectedCurriculum"
         :items ="curriculums"
-        item-text = "major"
         item-value= "id"
         prepend-icon="mdi-format-align-justify"
         menu-props="auto"
@@ -135,6 +134,12 @@
         label="Select a curriculum to build a report"
         single-line
       >
+        <template slot="selection" slot-scope="data">
+          {{ data.item.major }} {{ data.item.year }}
+        </template>
+        <template slot="item" slot-scope="data">
+          {{ data.item.major }} {{ data.item.year }}
+        </template>
       </v-select>
       <v-btn
           color="success"
@@ -143,6 +148,7 @@
       </v-btn>
     </v-row>
     <base-material-card
+      v-if="tableInfo.completeRequirements && tableInfo.completeRequirements.length > 0"
       icon="mdi-text-box-check"
       title="Audit"
       class="px-5 py-3"
@@ -198,6 +204,7 @@
         md="6"
       >
         <base-material-card
+          v-if="tableInfo.unmappedRequirements && tableInfo.unmappedRequirements.length > 0"
           icon="mdi-text-box-remove"
           title="Unmapped requirements"
           class="px-5 py-3"
@@ -232,6 +239,7 @@
         md="6"
       >
         <base-material-card
+          v-if="tableInfo.unmappedCourses && tableInfo.unmappedCourses.length > 0"
           icon="mdi-text-box-plus"
           title="Unmapped courses"
           class="px-5 py-3"
@@ -270,6 +278,7 @@
       <v-spacer></v-spacer>
       <v-col cols="3" md="2">
           <v-btn
+            v-if="map2unmap.length > 0 || (unmappedCourse && unmappedReq)"
             color="error"
             @click="dialog = true"
           >
@@ -281,6 +290,7 @@
       </v-col>
       <v-col cols="3" md="2">
           <v-btn
+            v-if="tableInfo !== ''"
             color="error"
             @click="del=true, dialog = true"
           >
@@ -350,7 +360,7 @@
         student: {},
         semesterGPAchart: {},
         courseGPAchart: {},
-        tableInfo: [],
+        tableInfo: '',
         curriculums: [],
         selectedCurriculum: "",
         map2unmap: [],

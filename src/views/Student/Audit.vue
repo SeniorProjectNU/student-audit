@@ -168,7 +168,7 @@
         <tbody>
           <tr v-for="course in tableInfo.completeRequirements"
               :key="course.id"
-              @click.stop="allRowChecbox(map2unmap, course.requirement.id)">
+              @click.stop="allRowCheckbox(map2unmap, course.requirement.id)">
               <td><input type="checkbox" :value=course.requirement.id v-model="map2unmap"/></td>
               <td>
                 {{course.requirement.name}}
@@ -481,15 +481,12 @@
           this.unmappedCourse = '';
           post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '', () => this.getReport(), {});
         } else {
-          for(var i = 0; i < this.map2unmap.length; i++) {
-            post(this, '/report/' + this.student.id + '/detachRequirement?requirementId='+this.map2unmap[i], '', () => {
-              this.getReport();
-            }, {});
-          }
+          this.map2unmap.forEach(x => post(this, '/report/' + this.student.id + '/detachRequirement?requirementId='+x,
+            '', () => this.getReport(), {}));
           this.map2unmap = []
         }
       },
-      allRowChecbox(map2unmap, id) {
+      allRowCheckbox(map2unmap, id) {
         if(map2unmap.includes(id)) {
           map2unmap = map2unmap.splice(map2unmap.indexOf(id),1);
         } else {

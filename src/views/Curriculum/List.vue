@@ -5,7 +5,7 @@
             tag="section"
     >
         <v-row justify="space-between">
-            <v-col cols="6" md="2">
+            <v-col cols="3">
                 <v-select v-model="pageSize"
                           :items ="pageSizeOptions"
                           prepend-icon="mdi-format-align-justify"
@@ -16,7 +16,7 @@
                 >
                 </v-select>
             </v-col>
-            <v-col cols="6" md="4">
+            <v-col cols="6" md="3" lg="3">
                 <v-row no-gutters>
                     <v-col>
                         <v-btn

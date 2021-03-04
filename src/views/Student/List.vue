@@ -354,8 +354,8 @@ export default {
     },
     // mails
     showMails( ) {
-      for( var i = 0; i < this.selectedStudents.length; i ++ ) {
-        this.mails += this.students.find(s => s.id === this.selectedStudents[ i ] ).mail
+      for( let i = 0; i < this.selectedStudents.length; i ++ ) {
+        this.mails += this.students.find(s => s.id === this.selectedStudents[ i ] ).mail;
         this.mails += ', '
       }
     },
@@ -364,7 +364,7 @@ export default {
     },
     // remove
     removeStudents( ids ) {
-      for(var i = 0; i < ids.length; i ++) {
+      for(let i = 0; i < ids.length; i ++) {
         del(this, '/transcript/'+ids[i], '',  () => this.getStudents(), {});
       }
       this.del = false;

@@ -12,7 +12,7 @@
                 </v-card-text>
                 <v-divider></v-divider>
                 <v-card-actions class="flex justify-space-between">
-                    <v-btn color="blue darken-1" @click="submit(false)">{{$t('no')}}</v-btn>
+                    <v-btn color="blue darken-1" @click="show = false">{{$t('no')}}</v-btn>
                     <v-btn color="blue darken-1 mr-0" @click="submit(true)">{{$t('yes')}}</v-btn>
                 </v-card-actions>
             </v-card>
@@ -35,7 +35,7 @@
       methods: {
         submit (val) {
           this.$emit('submit', val);
-          this.show = false;
+          this.closeModal();
         },
         showModal () {
           this.show = true;

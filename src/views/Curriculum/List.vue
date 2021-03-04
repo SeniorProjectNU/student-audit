@@ -142,8 +142,8 @@
         },
         deleteCurriculum(val){
           let _this = this;
-          for(var i = 0; i < val.length; i ++) {
-            del(_this, '/curriculum/'+val[i], '',  {});
+          for(let i = 0; i < val.length; i ++) {
+            del(_this, '/curriculum/'+val[i], '',  ()=>_this.getCurriculums());
           }
         },
         selectAll() {

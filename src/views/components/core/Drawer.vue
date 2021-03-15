@@ -108,12 +108,6 @@
     data: () => ({
       items: [
         {
-          icon: 'mdi-view-dashboard',
-          title: 'dashboard',
-          to: '/',
-          group: 'dashboard'
-        },
-        {
           icon: 'mdi-calendar-multiple',
           title: 'Curriculums',
           to: '/curriculums-list',

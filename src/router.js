@@ -11,15 +11,10 @@ export default new Router({
       path: '/',
       component: () => import('@/views/Index'),
       children: [
-        // Dashboard
-        {
-          name: 'Dashboard',
-          path: '',
-          component: () => import('@/views/Dashboard'),
-        },
         {
           name: 'Curriculums',
           path: '/curriculums-list',
+          alias: '/',
           component: () => import('@/views/Curriculum/List'),
         },
         {

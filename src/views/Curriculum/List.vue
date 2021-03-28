@@ -16,7 +16,7 @@
                 >
                 </v-select>
             </v-col>
-            <v-col cols="6" md="3" lg="3">
+            <v-col cols="6">
                 <v-row no-gutters>
                     <v-col>
                         <v-btn

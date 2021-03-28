@@ -20,7 +20,7 @@
                 <v-row no-gutters>
                     <v-col>
                         <v-btn
-                                @click="showDeleteModal(selectedCurriculums)"
+                                @click="showDeleteModal()"
                                 :class="{'d-none': selectedCurriculums.length === 0}"
                                 color="success">
                             {{$t('delete.text')}}
@@ -137,7 +137,8 @@
           })
         },
         showDeleteModal(val){
-          this.toDelete = val;
+          if (val)
+            this.toDelete = val;
           this.$refs.delete.showModal();
         },
         deleteCurriculum(val){

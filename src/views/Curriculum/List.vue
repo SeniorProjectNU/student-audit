@@ -134,7 +134,6 @@
 
           get(_this, '/curriculum', '', response=>{
             _this.curriculums = response.data;
-            _this.selectedCurriculums = [];
           })
         },
         showDeleteModal(val){
@@ -143,11 +142,22 @@
         },
         deleteCurriculum(val){
           let _this = this;
+          let temp = _this.selectedCurriculums;
+          if (val !== _this.selectedCurriculums){
+            let i = _this.selectedCurriculums.findIndex(x=> x===val[0]);
+            if (i !== -1)
+              temp.splice(i, 1);
+            localStorage.setItem('selectedCurriculums', JSON.stringify(temp));
+          }
           val.forEach((x, idx, arr)=> del(_this, '/curriculum/'+x, '',
               ()=> {
                 if (idx === arr.length-1){
                   _this.$store.dispatch('setSnackbar', {text: "Successfully deleted"});
+                  if (val !== _this.selectedCurriculums){
+                    temp = JSON.parse(localStorage.getItem('selectedCurriculums'));
+                  }
                   _this.getCurriculums();
+                  _this.selectedCurriculums = temp;
                   _this.toDelete = "";
                 }
               }, error=>{

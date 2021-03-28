@@ -318,8 +318,14 @@
             _this.curriculumId = response.data.id;
             _this.tab = 1;
             _this.stage = 1;
+            _this.$store.dispatch('setSnackbar', {
+              text: "Curriculum created",
+            })
           }, error => {
-            console.log(error);
+            _this.$store.dispatch('setSnackbar', {
+              text: error,
+              color: "error"
+            })
           });
 
         },
@@ -348,13 +354,17 @@
           let formData = new FormData();
           formData.append('file', this.files);
 
-          post(_this, '/curriculum/'+_this.curriculumId,formData, response=> {
+          post(_this, '/curriculum/'+_this.curriculumId, formData, response=> {
             _this.curriculum = response.data;
             _this.stage = 2;
             _this.tab = 2;
             _this.addFile = false;
+            _this.$store.dispatch('setSnackbar', {text: "Curriculum successfully filled"})
           }, error=>{
-            console.log(error);
+            _this.$store.dispatch('setSnackbar', {
+              text: error,
+              color: "error"
+            })
           }, {
                 'Content-Type': 'multipart/form-data'
               });

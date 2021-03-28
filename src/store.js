@@ -8,6 +8,7 @@ export default new Vuex.Store({
     barColor: 'rgba(0, 0, 0, .8), rgba(0, 0, 0, .8)',
     barImage: '',
     drawer: null,
+    snackbars:[]
   },
   mutations: {
     SET_BAR_IMAGE (state, payload) {
@@ -16,8 +17,15 @@ export default new Vuex.Store({
     SET_DRAWER (state, payload) {
       state.drawer = payload
     },
+    SET_SNACKBAR(state, snackbar){
+      state.snackbars = state.snackbars.concat(snackbar);
+    }
   },
   actions: {
-
+    setSnackbar({commit}, snackbar) {
+      snackbar.showing = true;
+      snackbar.color = snackbar.color || "success";
+      commit('SET_SNACKBAR', snackbar);
+    }
   },
 })

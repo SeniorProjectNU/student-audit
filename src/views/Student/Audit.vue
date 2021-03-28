@@ -461,8 +461,9 @@
 
         post(this, '/report', data, response => {
           this.tableInfo = response.data;
+          this.$store.dispatch('setSnackbar', {text: "Success"})
         }, error => {
-          console.log(error);
+          this.$store.dispatch('setSnackbar', {text: error, color: "error"});
         });
       },
       selectAll( ) {
@@ -478,7 +479,14 @@
         if(this.map2unmap.length === 0) {
           if(this.unmappedReq.credit <= this.unmappedCourse.credits) {
             let query = 'requirementId='+this.unmappedReq.id+'&courseId='+this.unmappedCourse.id;
-            post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '', () => this.getReport(), {});
+            post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '',
+                () => {
+              this.getReport();
+                  this.$store.dispatch('setSnackbar', {text: "Success"});
+                },
+                error => {
+              this.$store.dispatch('setSnackbar', {text: error, color: "error"});
+            });
           }
         } else {
           this.map2unmap.forEach(x => post(this, '/report/' + this.student.id + '/detachRequirement?requirementId='+x,

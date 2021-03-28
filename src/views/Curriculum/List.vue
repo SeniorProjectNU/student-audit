@@ -84,7 +84,7 @@
                         <v-tooltip open-delay="83" bottom>
                             <template v-slot:activator="{ on, attrs }">
                                 <v-icon
-                                        @click.stop="showDeleteModal([plan.id])"
+                                        @click.stop="showDeleteModal([plan.id]);"
                                         v-bind="attrs"
                                         v-on="on"
                                         color="error"
@@ -101,14 +101,14 @@
         </base-material-card>
         <DeleteModal
                 disabled ref="delete"
-                :number="selectedToDelete.length"
-                @submit="deleteCurriculum(selectedToDelete)">
+                :number="toDelete ? 1 : selectedCurriculums.length"
+                @submit="deleteCurriculum(toDelete ? toDelete : selectedCurriculums)">
         </DeleteModal>
     </v-container>
 </template>
 
 <script>
-    import { get, del } from '../../helpers/api'
+    import { get, del } from '@/helpers/api'
 
     import DeleteModal from '../common/modal/DeleteModal.vue'
 
@@ -119,9 +119,9 @@
 
       data () {
         return {
+          toDelete: "",
           curriculums: [],
           selectedCurriculums: [],
-          selectedToDelete: [],
           allSelected: false,
           pageSize: 10,
           pageSizeOptions: [10, 25, 50, 100],
@@ -134,17 +134,25 @@
 
           get(_this, '/curriculum', '', response=>{
             _this.curriculums = response.data;
+            _this.selectedCurriculums = [];
           })
         },
-        showDeleteModal(ids){
-          this.selectedToDelete = ids;
+        showDeleteModal(val){
+          this.toDelete = val;
           this.$refs.delete.showModal();
         },
         deleteCurriculum(val){
           let _this = this;
-          for(let i = 0; i < val.length; i ++) {
-            del(_this, '/curriculum/'+val[i], '',  ()=>_this.getCurriculums());
-          }
+          val.forEach((x, idx, arr)=> del(_this, '/curriculum/'+x, '',
+              ()=> {
+                if (idx === arr.length-1){
+                  _this.$store.dispatch('setSnackbar', {text: "Successfully deleted"});
+                  _this.getCurriculums();
+                  _this.toDelete = "";
+                }
+              }, error=>{
+            _this.$store.dispatch('setSnackbar', {text: error, color: "error"});
+          }));
         },
         selectAll() {
           this.selectedCurriculums = [];

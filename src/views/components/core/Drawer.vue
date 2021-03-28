@@ -110,7 +110,7 @@
         {
           icon: 'mdi-calendar-multiple',
           title: 'Curriculums',
-          to: '/curriculums-list',
+          to: '/',
           group: 'curriculum'
         },
         {

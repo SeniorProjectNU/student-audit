@@ -13,8 +13,7 @@ export default new Router({
       children: [
         {
           name: 'Curriculums',
-          path: '/curriculums-list',
-          alias: '/',
+          path: '/',
           component: () => import('@/views/Curriculum/List'),
         },
         {

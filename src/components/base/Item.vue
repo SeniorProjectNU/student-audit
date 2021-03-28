@@ -4,7 +4,7 @@
     :rel="href && href !== '#' ? 'noopener' : undefined"
     :target="href && href !== '#' ? '_blank' : undefined"
     :to="item.to"
-    :class="$route.path.includes(item.group) || ($route.path == '/' && item.group == 'dashboard')
+    :class="$route.path.includes(item.group) || ($route.path == '/' && item.group == 'curriculum')
      ? `primary ${!isDark ? 'black' : 'white'}--text` : ''"
   >
     <v-list-item-icon

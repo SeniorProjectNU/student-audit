@@ -1,51 +1,69 @@
 <template>
   <v-container>
-      <v-row>
-          <v-col
-                  v-for="(student, index) in students" :key="index"
-          >
+    <v-expansion-panels v-model="panel" multiple>
+      <v-expansion-panel>
+        <v-expansion-panel-header>
+          <span class="text-h4">
+            Students
+          </span>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-row>
+            <v-col
+                cols="6"
+                v-for="(student, index) in students" :key="index"
+            >
               <base-material-card
-                      color="info"
-                      icon="mdi-account-details"
-                      title="Student information"
+                  color="info"
+                  icon="mdi-account-details"
+                  title="Student information"
               >
-                  <v-card-text>
-                      <div class="display-2 font-weight-light">
-                          {{student.name}}
-                      </div>
-                      <div class="display-2 font-weight-light">
-                          {{student.id}}
-                      </div>
-                      <div class="text--primary font-weight-light">
-                          {{student.major}}
-                      </div>
-                      <div class="text--primary font-weight-light">
-                          Admission semester: {{student.admissionSemester}}
-                      </div>
-                      <div class="text--primary">
-                          <span class="font-weight-light">cGPA:</span> {{student.gpa}}
-                      </div>
-                      <div class="text--primary">
-                          <span class="font-weight-light">Credits earned:</span> {{student.creditsEarned}}
-                      </div>
-                  </v-card-text>
+                <v-card-text>
+                  <div class="display-2 font-weight-light">
+                    {{student.name}}
+                  </div>
+                  <div class="display-2 font-weight-light">
+                    {{student.id}}
+                  </div>
+                  <div class="text--primary font-weight-light">
+                    {{student.major}}
+                  </div>
+                  <div class="text--primary font-weight-light">
+                    Admission semester: {{student.admissionSemester}}
+                  </div>
+                  <div class="text--primary">
+                    <span class="font-weight-light">cGPA:</span> {{student.gpa}}
+                  </div>
+                  <div class="text--primary">
+                    <span class="font-weight-light">Credits earned:</span> {{student.creditsEarned}}
+                  </div>
+                </v-card-text>
               </base-material-card>
-          </v-col>
-      </v-row>
-      <v-row>
-          <v-col>
+            </v-col>
+          </v-row>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <v-expansion-panel>
+        <v-expansion-panel-header><span class="text-h4">Comparison</span></v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-row>
+            <v-col>
               <base-material-chart-card
-                      :data="data"
-                      :options="chartOptions"
-                      color="success"
-                      type="Line"
+                  elevation="0"
+                  :data="data"
+                  :options="chartOptions"
+                  color="success"
+                  type="Line"
               >
-                  <h4 class="card-title font-weight-light mt-2 ml-2">
-                      Comparison
-                  </h4>
+                <h4 class="card-title font-weight-light mt-2 ml-2">
+                  Comparison
+                </h4>
               </base-material-chart-card>
-          </v-col>
-      </v-row>
+            </v-col>
+          </v-row>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
   </v-container>
 </template>
 
@@ -65,6 +83,7 @@
                   [3.1, 3.3, 2.04, 2.5, 3.6, 3.1, 3.3, 2.04, 2.99]]
           },
           students: [],
+          panel: [0, 1],
           chartOptions: {
               high: 4,
               low: 0,
@@ -96,8 +115,15 @@
           let _this = this;
           get(_this, '/transcript/students/'+_this.id, {}, response=>{
               _this.students = response.data;
+              // _this.getGraph();
           });
       },
+      getGraph(){
+        let _this = this;
+        get(_this, '/transcript/studentsGraph/'+_this.id, {}, response=>{
+          _this.data = response.data;
+        });
+      }
     },
     computed: {
       chartData(){
@@ -113,6 +139,7 @@
     },
     created() {
       this.getStudents();
+      this.getGraph();
     }
   }
 </script>

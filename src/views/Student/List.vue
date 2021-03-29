@@ -96,7 +96,7 @@
     </base-material-card>
     <v-row>
       <v-col
-        cols="2">
+        cols="1">
         <v-btn
           v-if="selectedStudents.length>0"
           color="success"
@@ -106,7 +106,7 @@
       </v-col>
       <v-spacer/>
       <v-col
-        cols="2">
+        cols="1">
         <router-link v-if="selectedStudents.length>1"
           :to="{ name: 'Compare Students', query: { id: selectedStudents } }" >
           <v-btn  color="success">

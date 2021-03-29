@@ -23,7 +23,7 @@
                     <v-tabs-items v-model="tab">
                         <v-tab-item :class="{'d-none': action === 'edit'}">
                                 <v-form>
-                                    <v-container class="py-0">
+                                    <v-container class="py-0" style="margin-left: 0; margin-right: 0; max-width: none">
                                         <v-row>
                                             <v-col
                                                     cols="12"

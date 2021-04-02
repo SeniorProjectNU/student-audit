@@ -83,57 +83,18 @@
       .ct-grid
         stroke: rgba(255, 255, 255, 0.2)
 
-      /*.ct-series-a .ct-point,*/
-      /*.ct-series-a .ct-line,*/
-      /*.ct-series-a .ct-bar,*/
-      /*.ct-series-a .ct-slice-donut*/
-      /*    stroke: rgba(255,255,255,.8)*/
-
-      /*.ct-series-a .ct-slice-pie,*/
-      /*.ct-series-a .ct-area*/
-      /*    fill: rgba(255,255,255,.4)*/
+      //.ct-series-a .ct-point,
+      //.ct-series-a .ct-line,
+      //.ct-series-a .ct-bar,
+      //.ct-series-a .ct-slice-donut
+      //    stroke: #3b12f5
+      //
+      //.ct-series-a .ct-slice-pie,
+      //.ct-series-a .ct-area
+      //    fill: #3b12f5
 </style>
 
 <style lang='scss'>
-  $ct-series-colors: (
-          #d70206,
-          #f05b4f,
-          #f4c63d,
-          #d17905,
-          #453d3f,
-          #59922b,
-          #0544d3,
-          #6b0392,
-          #f05b4f,
-          #dda458,
-          #eacf7d,
-          #86797d,
-          #b2c326,
-          #6188e2,
-          #a748ca
-  ) !default;
-
-  $data-color-map: ('first-series-class': #f05b4f, 'second-series-class': #f4c63d, 'third-series': #2b922d);
-
-  @each $cat, $color in $data-color-map {
-    .#{$cat} {
-      .ct-point,
-      .ct-line,
-      .ct-bar,
-      .ct-slice-donut {
-        stroke: $color
-      }
-      .ct-slice-pie,
-      .ct-area {
-        fill: $color
-      }
-      /* this renders as li.series-name:before */
-      @at-root li#{&}:before {
-        background-color: $color;
-        border-color: $color;
-      }
-    }
-  }
 
   .ct-legend {
     position: relative;

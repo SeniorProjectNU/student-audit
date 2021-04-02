@@ -55,9 +55,9 @@
                   color="success"
                   type="Line"
               >
-                <h4 class="card-title font-weight-light mt-2 ml-2">
+                <div ref="legend" class="card-title font-weight-light mt-2 ml-2">
                   Comparison
-                </h4>
+                </div>
               </base-material-chart-card>
             </v-col>
           </v-row>
@@ -75,12 +75,8 @@
     data () {
       return {
           data: {
-              labels: ['Fall 2017', 'Spring 2018', 'Fall 2018', 'Spring 2019', 'Fall 2019', 'Spring 2020', 'Fall 2020',
-                  'Spring 2021', 'Fall 2021'],
-              series: [
-                  [3.3, 3.6, null, 3.7, null, 2.8, 2.5, 3.23, 3.6],
-                  [3.2, 3.1, null, 3.5, 2.7, 3.3, 3.1, 3.3, 2.04],
-                  [3.1, 3.3, 2.04, 2.5, 3.6, 3.1, 3.3, 2.04, 2.99]]
+              labels: [],
+              series: []
           },
           students: [],
           panel: [0, 1],
@@ -104,7 +100,7 @@
                           flipTitle: true
                       }
                   }),
-                  // this.$chartist.plugins.legend({legendNames: ["Hey", "Pay"]})
+                  this.$chartist.plugins.legend({className: "legend", position: this.$refs.legend})
               ]
             }
           }
@@ -115,7 +111,7 @@
           let _this = this;
           get(_this, '/transcript/students/'+_this.id, {}, response=>{
               _this.students = response.data;
-              // _this.getGraph();
+              _this.getGraph();
           });
       },
       getGraph(){
@@ -125,15 +121,15 @@
           _this.data.series = [];
           for (let j in response.data.graph){
             let student = response.data.graph[j];
-            let student_series = [];
+            let student_series = {name: j, data: []};
             response.data.terms.forEach(term => {
 
               let i = student.find(semester => {return semester["termName"] == term});
 
               if (i){
-                student_series.push({x: i.termName, y: i.termGpa});
+                student_series.data.push({x: i.termName, y: i.termGpa});
               }else{
-                student_series.push({x: term, y: null})
+                student_series.data.push({x: term, y: null})
               }
             });
             _this.data.series.push(student_series);
@@ -155,7 +151,7 @@
     },
     created() {
       this.getStudents();
-      this.getGraph();
+      // this.getGraph();
     }
   }
 </script>
@@ -180,4 +176,5 @@
     {
         fill: #c6e6c7;
     }
+
 </style>

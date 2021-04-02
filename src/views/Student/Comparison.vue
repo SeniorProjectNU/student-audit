@@ -121,21 +121,37 @@
       getGraph(){
         let _this = this;
         get(_this, '/transcript/studentsGraph/'+_this.id, {}, response=>{
-          _this.data = response.data;
+          _this.data.labels = response.data.terms;
+          _this.data.series = [];
+          for (let j in response.data.graph){
+            let student = response.data.graph[j];
+            let student_series = [];
+            response.data.terms.forEach(term => {
+
+              let i = student.find(semester => {return semester["termName"] == term});
+
+              if (i){
+                student_series.push({x: i.termName, y: i.termGpa});
+              }else{
+                student_series.push({x: term, y: null})
+              }
+            });
+            _this.data.series.push(student_series);
+          }
         });
       }
     },
     computed: {
-      chartData(){
-          return {
-              labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
-              series: [
-              [12, 9, 7, 8, 5],
-              [2, 1, 3.5, 7, 3],
-              [1, 3, 4, 5, 6]
-          ]
-          }
-      },
+      // chartData(){
+      //     return {
+      //         labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      //         series: [
+      //         [12, 9, 7, 8, 5],
+      //         [2, 1, 3.5, 7, 3],
+      //         [1, 3, 4, 5, 6]
+      //     ]
+      //     }
+      // },
     },
     created() {
       this.getStudents();

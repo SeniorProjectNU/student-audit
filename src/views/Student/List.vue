@@ -342,7 +342,17 @@ export default {
           let formData = new FormData();
           formData.append('file', this.files[i]);
 
-          post(this, '/transcript', formData, () => this.getStudents(), {}, {
+          post(this, '/transcript', formData, () => {
+            this.getStudents();
+            this.$store.dispatch('setSnackbar', {
+              text: "Transcript uploaded",
+            })
+          }, error =>{
+            this.$store.dispatch('setSnackbar', {
+              text: error,
+              color: "error"
+            })
+          }, {
             'Content-Type': 'multipart/form-data'
           });
         }

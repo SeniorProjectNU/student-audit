@@ -79,30 +79,6 @@
       </v-col>
     </v-row>
     <v-row>
-      <!-- v-col
-        cols="6"
-      >
-        <base-material-chart-card
-          :data="courseGPAchart.data"
-          :options="courseGPAchart.options"
-          :responsive-options="courseGPAchart.responsiveOptions"
-          color="#E91E63"
-          hover-reveal
-          type="Bar"
-        >
-          <template v-slot:reveal-actions>
-          </template>
-
-          <h4 class="card-title font-weight-light mt-2 ml-2">
-            Average GPA over course categories
-          </h4>
-
-          <p class="d-inline-flex font-weight-light ml-2 mt-1">
-            
-          </p>
-        </base-material-chart-card>
-      </v-col -->
-
       <v-col
         cols="12"
       >
@@ -359,7 +335,6 @@
         earned: 0,
         student: {},
         semesterGPAchart: {},
-        courseGPAchart: {},
         tableInfo: '',
         curriculums: [],
         selectedCurriculum: "",
@@ -416,41 +391,11 @@
           chartInfo.forEach(x => this.semesterGPAchart.data.series[0].push(x.termGpa))
         })
       },
-      // TODO
-      getCourseChart() {
-        this.courseGPAchart = {
-          data: {
-            labels: [],
-            series: [[]],
-          },
-          options: {
-            axisX: {
-              showGrid: false,
-            },
-            low: 0,
-            high: 4.5,
-            chartPadding: {
-              top: 0,
-              right: 5,
-              bottom: 0,
-              left: 0,
-            },
-          },
-          responsiveOptions: [
-            ['screen and (max-width: 640px)', {
-              seriesBarDistance: 5,
-              axisX: {
-                labelInterpolationFnc: function (value) {
-                  return value[0]
-                },
-              },
-            }],
-          ],
-        }
-      },
       getReport() {
         get(this, '/report/'+ this.$route.params.id, '', response => {
-          this.tableInfo = response.data;
+          if(response.data.data === true) {
+            this.tableInfo = response.data.content;
+          }
         });
       },
       buildReport( ) {
@@ -481,16 +426,20 @@
             let query = 'requirementId='+this.unmappedReq.id+'&courseId='+this.unmappedCourse.id;
             post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '',
                 () => {
-              this.getReport();
+                  this.getReport();
                   this.$store.dispatch('setSnackbar', {text: "Success"});
-                },
-                error => {
-              this.$store.dispatch('setSnackbar', {text: error, color: "error"});
-            });
+                }, error => {
+                  this.$store.dispatch('setSnackbar', {text: error, color: "error"});
+                });
           }
         } else {
           this.map2unmap.forEach(x => post(this, '/report/' + this.student.id + '/detachRequirement?requirementId='+x,
-            '', () => this.getReport(), {}));
+            '', () => {
+              this.getReport();
+              this.$store.dispatch('setSnackbar', {text: "Success"});
+            }, error => {
+              this.$store.dispatch('setSnackbar', {text: error, color: "error"});
+            }));
         }
         this.unmappedReq = '';
         this.unmappedCourse = '';
@@ -508,15 +457,17 @@
       },
       removeAudit() {
         del(this, '/report/'+this.$route.params.id, '',  () => { 
-          this.getReport();
-        }, {});
+          this.tableInfo = '';
+          this.$store.dispatch('setSnackbar', {text: "Success"});
+        }, error => {
+          this.$store.dispatch('setSnackbar', {text: error, color: "error"});
+        });
       }
     },
 
     created() {
       this.getInfo()
       this.getCurriculums()
-      this.getCourseChart()
       this.getSemesterChart()
       this.getReport()
     },

@@ -375,7 +375,17 @@ export default {
     // remove
     removeStudents( ids ) {
       for(let i = 0; i < ids.length; i ++) {
-        del(this, '/transcript/'+ids[i], '',  () => this.getStudents(), {});
+        del(this, '/transcript/'+ids[i], '',  () => {
+          this.getStudents()
+          this.$store.dispatch('setSnackbar', {
+            text: "Transcripts deleted",
+          })
+        }, error => {
+          this.$store.dispatch('setSnackbar', {
+            text: error,
+            color: "error"
+          })
+        });
       }
       this.del = false;
     },

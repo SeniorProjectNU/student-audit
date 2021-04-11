@@ -132,7 +132,8 @@
       <v-simple-table>
         <thead>
           <tr>
-            <th><input class="mr-3" type="checkbox" @click="selectAll" v-model="allSelected"/></th>
+            <th><input class="mr-3" type="checkbox" @click="selectAll" v-model="allSelected"
+                :disabled = "unmappingDisabled"/></th>
             <th class="primary--text display-1">Required Course</th>
             <th class="primary--text display-1">Credits</th>
             <th class="primary--text display-1">Taken</th>
@@ -145,7 +146,8 @@
           <tr v-for="course in tableInfo.completeRequirements"
               :key="course.id"
               @click.stop="allRowCheckbox(map2unmap, course.requirement.id)">
-              <td><input type="checkbox" :value=course.requirement.id v-model="map2unmap"/></td>
+              <td><input type="checkbox" :value=course.requirement.id v-model="map2unmap"
+                  :disabled = "unmappingDisabled"/></td>
               <td>
                 {{course.requirement.name}}
               </td>
@@ -196,9 +198,10 @@
 
             <tbody>
               <tr v-for="req in tableInfo.unmappedRequirements"
-                  :key="req.id"
-                  @click.stop="unmappedReq=req">
-                  <td><input type="radio" :value=req v-model="unmappedReq"/></td>
+                  :key="req"
+                  @click.stop="allRowCheckbox(unmappedReq, req)">
+                  <td><input type="checkbox" :value=req v-model="unmappedReq"
+                      :disabled = "mappingReqDisabled"/></td>
                   <td>
                     {{req.name}}
                   </td>
@@ -232,9 +235,10 @@
 
             <tbody>
               <tr v-for="course in tableInfo.unmappedCourses"
-                  :key="course.id"
-                  @click.stop="unmappedCourse=course">
-                  <td><input type="radio" :value=course v-model="unmappedCourse"/></td>
+                  :key="course"
+                  @click.stop="allRowCheckbox(unmappedCourse, course)">
+                  <td><input type="checkbox" :value=course v-model="unmappedCourse"
+                      :disabled = "mappingCourseDisabled"/></td>
                   <td>
                     {{course.code}}
                   </td>
@@ -254,7 +258,7 @@
       <v-spacer></v-spacer>
       <v-col cols="3" md="2">
           <v-btn
-            v-if="map2unmap.length > 0 || (unmappedCourse !== '' && unmappedReq !== '')"
+            v-if="map2unmap.length > 0 || (unmappedCourse.length !== 0 && unmappedReq.length !== 0)"
             color="error"
             @click="dialog = true"
           >
@@ -296,7 +300,7 @@
         </v-card-title>
 
         <v-card-text class="text-center">
-          {{del ? 'Are you sure you want to delete?' : (map2unmap.length > 0 ? 'Are you sure you want to unmap the selected row(s)?' : ( unmappedReq.credit > unmappedCourse.credits ? 'Credits do not match' : (unmappedReq !== '' && unmappedCourse !== '' ? 'Are you sure you want to map the selected course to the selected requirement?' : 'Nothing selected or incorrect selection!')))}}
+          {{del ? 'Are you sure you want to delete?' : (map2unmap.length > 0 ? 'Are you sure you want to unmap the selected row(s)?' : (unmappedReq.length !== 0 && unmappedCourse.length !== 0 ? 'Are you sure you want to map the selected courses to the selected requirements?' : 'Nothing selected or incorrect selection!'))}}
         </v-card-text>
 
         <v-card-actions>
@@ -304,7 +308,7 @@
           <v-btn
             color="warning"
             text
-            @click="dialog = false, del = false, map2unmap = [], unmappedCourse = '', unmappedReq = ''"
+            @click="dialog = false, del = false, map2unmap = [], unmappedCourse = [], unmappedReq = []"
           >
             Cancel
           </v-btn>
@@ -339,9 +343,12 @@
         curriculums: [],
         selectedCurriculum: "",
         map2unmap: [],
+        unmappingDisabled: false,
         allSelected: false,
-        unmappedCourse: '',
-        unmappedReq: '',
+        unmappedCourse: [],
+        mappingCourseDisabled: false,
+        unmappedReq: [],
+        mappingReqDisabled: false,
         dialog: false,
         del: false
       }
@@ -350,6 +357,18 @@
     watch: {
       map2unmap(val) {
         this.allSelected = val.length === this.tableInfo.completeRequirements.length;
+        this.mappingCourseDisabled = this.map2unmap.length > 0;
+        this.mappingReqDisabled = this.map2unmap.length > 0;
+      },
+      unmappedReq() {
+        this.unmappingDisabled = this.unmappedReq.length > 0;
+        this.mappingCourseDisabled = this.unmappedCourse.length > this.unmappedReq.length + 1;
+        this.mappingReqDisabled = this.unmappedCourse.length + 1 < this.unmappedReq.length;
+      },
+      unmappedCourse() {
+        this.unmappingDisabled = this.unmappedCourse.length > 0;
+        this.mappingCourseDisabled = this.unmappedCourse.length > this.unmappedReq.length + 1;
+        this.mappingReqDisabled = this.unmappedCourse.length + 1 < this.unmappedReq.length;
       }
     },
     
@@ -421,16 +440,19 @@
         }
       },
       mapUnmap( ) {
-        if(this.map2unmap.length === 0) {
-          if(this.unmappedReq.credit <= this.unmappedCourse.credits) {
-            let query = 'requirementId='+this.unmappedReq.id+'&courseId='+this.unmappedCourse.id;
-            post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '',
-                () => {
-                  this.getReport();
-                  this.$store.dispatch('setSnackbar', {text: "Success"});
-                }, error => {
-                  this.$store.dispatch('setSnackbar', {text: error, color: "error"});
-                });
+        if(this.unmappedReq.length > 0 && this.unmappedCourse.length > 0) {
+          for(var i = 0; i < this.unmappedCourse.length; i ++) {
+            if(this.unmappedReq[i].credit <= this.unmappedCourse[i].credits) {
+              let query = 'requirementId='+this.unmappedReq[i].id+'&courseId='+this.unmappedCourse[i].id;
+              console.log(query)
+              post(this, '/report/' + this.student.id + '/mapRequirement?'+query, '',
+                  () => {
+                    this.getReport();
+                    this.$store.dispatch('setSnackbar', {text: "Success"});
+                  }, error => {
+                    this.$store.dispatch('setSnackbar', {text: error, color: "error"});
+                  });
+            }
           }
         } else {
           this.map2unmap.forEach(x => post(this, '/report/' + this.student.id + '/detachRequirement?requirementId='+x,
@@ -441,15 +463,19 @@
               this.$store.dispatch('setSnackbar', {text: error, color: "error"});
             }));
         }
-        this.unmappedReq = '';
-        this.unmappedCourse = '';
+        this.unmappedReq = [];
+        this.unmappedCourse = [];
         this.map2unmap = []
       },
-      allRowCheckbox(map2unmap, id) {
-        if(map2unmap.includes(id)) {
-          map2unmap = map2unmap.splice(map2unmap.indexOf(id),1);
-        } else {
-          map2unmap.push(id);
+      allRowCheckbox(arr, obj) {
+        if((arr === this.map2unmap && !this.unmappingDisabled) ||
+           (arr === this.unmappedCourse && !this.mappingCourseDisabled) ||
+           (arr === this.unmappedReq && !this.mappingReqDisabled)) {
+          if(arr.includes(obj)) {
+            arr = arr.splice(arr.indexOf(obj),1);
+          } else {
+            arr.push(obj);
+          }
         }
       },
       downloadAudit( ) {
